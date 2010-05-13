@@ -123,7 +123,9 @@ class Installer {
   function diePage($message, $title = '') {
     // check if compiled directory is writeable
     if ( !is_writable(self::$__view->compile_dir) ) {
-      echo 'ERROR: ' . self::$__view->compile_dir . ' is not writeable!' ;
+      echo '<strong>ERROR: ' . self::$__view->compile_dir . ' is not writeable!</strong><br>';
+      echo '<p>Make sure <code>' . self::$__view->compile_dir . '</code> is writeable by the webserver.<br>';
+      echo 'The fastest way: <code>chmod -R 777 ' . self::$__view->compile_dir . '</code>.</p>';
       die();
     }
     
