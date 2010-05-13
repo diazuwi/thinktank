@@ -130,7 +130,7 @@ class Installer {
     
     self::$__view->assign('message', $message);
     self::$__view->assign('subtitle', $title);
-    self::$__view->display('install.die.tpl');
+    self::$__view->display('installer.die.tpl');
     die();
   }
 }
