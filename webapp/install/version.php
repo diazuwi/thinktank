@@ -1,0 +1,5 @@
+<?php
+$THINKTANK_VERSION = '0.1';
+$THINKTANK_VERSION_REQUIRED['php'] = '5';
+$THINKTANK_VERSION_REQUIRED['mysql'] = '5';
+?>

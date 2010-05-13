@@ -4,13 +4,17 @@ define('DS', DIRECTORY_SEPARATOR);
 define('THINKTANK_ROOT_PATH', dirname(dirname(__FILE__)) . DS);
 // Define absolute path to thinktank's webapp directory
 define('THINKTANK_WEBAPP_PATH', dirname(__FILE__) . DS);
+// Define base URL, the same as $THINKTANK_CFG['site_root_path']
+define('THINKTANK_BASE_URL', substr($_SERVER['PHP_SELF'], 0, strpos( $_SERVER['PHP_SELF'], basename(__FILE__))));
 
 if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   // if config file doesn't exist
-  // TODO: create class.Installer.php
-  // require_once 'model/class.Installer.php';
-  echo "ERROR: ThinkTank config's file is not found ";
-  die();
+  
+  require_once 'model/class.Installer.php';
+  $installer = Installer::getInstance();
+  
+  $message = "<p>Config's file is not found</p>";
+  $installer->diePage($message);
 } else {
   // config file exists in THINKTANK_WEBAPP_PATH
   
