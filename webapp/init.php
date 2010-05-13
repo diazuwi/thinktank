@@ -13,7 +13,13 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   require_once 'model/class.Installer.php';
   $installer = Installer::getInstance();
   
-  $message = "<p>Config's file, <code>config.inc.php</code>, is not found!</p>";
+  $message  = "<p>Config's file, <code>config.inc.php</code>, is not found! ";
+  $message .= "No need to worry, this may happens if you're going install ThinkTank for the first time. ";
+  $message .= "Clik on the link below to start installation.";
+  $message .= '<div id="create-config-file" class="tt-button ui-state-default ui-priority-secondary ui-corner-all">';
+  $message .= '<a href="install/">Start Installation!</a>';
+  $message .= '</div>';
+  
   $installer->diePage($message, 'Error');
 } else {
   // config file exists in THINKTANK_WEBAPP_PATH

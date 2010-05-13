@@ -8,3 +8,10 @@ code {
   background-color: #FFF;
   margin-top: 20px;
 }
+#create-config-file {
+  width: 250px;
+  margin-top: 20px;
+}
+#create-config-file a {
+  display: block;
+}
