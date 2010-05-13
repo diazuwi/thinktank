@@ -1,9 +1,21 @@
 <?php
-/**
- * Retrieves and creates the config.inc.php file.
- *
- * The permissions for the base directory must allow for writing files in order
- * for the wp-config.php to be created using this page.
- */
+require_once 'model/class.Installer.php';
+$installer = Installer::getInstance();
+$step = (int) $_GET['step'];
+if (!$step) {
+  $step = 1;
+}
 
+switch ($step) {
+  case 1:
+    break;
+  case 2:
+    break;
+  case 3:
+    break;
+  case 4:
+    break;
+}
+
+$installer->page($step);
 ?>

@@ -15,7 +15,7 @@ class Installer {
  * @var array
  * @access private
  */
-  private $__errorMessages;
+  private $__errorMessages = array();
   
 /**
  * Stores current version of ThinkTank
@@ -74,16 +74,39 @@ class Installer {
  */
   function checkVersion() {
     $ret = false;
-    $php_ver_pass = false;
-    $mysql_ver_pass = false;
+    $ret = version_compare( phpversion(), $this->__requiredVersion['php'], '>=' );
     
-    $php_ver_pass = version_compare( phpversion(), $this->__requiredVersion['php'], '>=' );
+    return $ret;
+  }
+
+/**
+ * Check GD and cURL
+ * @return bool True when libs dependency available
+ */
+  function checkDependency() {
+    $ret = false;
+    // check curl
+    if ( !function_exists('curl_exec') ) {
+      
+    }
+    
+    // check GD
     
     return $ret;
   }
   
-  function checkDependency() {
+  function checkPermission() {
     $ret = false;
+    
+    return $ret;
+  }
+  
+  function checkAll() {
+    $version_compat = $this->checkVersion();
+    $lib_depends = $this->checkDependency();
+    $writeable_permission = $this->checkPermission;
+    
+    return ($version_compat && $lib_depends && $writeable_permission);
   }
   
 /**
@@ -96,12 +119,17 @@ class Installer {
   }
   
 /**
- * Installation steps
+ * Installation steps page
  * @param int $step Current step
  */
-  function display($step) {
+  function installPage($step) {
     switch ($step) {
       case 1:
+        $php_compat = 0;
+        if ( $this->checkVersion() ) {
+          $php_compat = 1;
+        }
+        self::$__view->assign('php_compat', $php_compat);
         break;
       case 2:
         break;
@@ -110,7 +138,7 @@ class Installer {
       case 4:
         break;
     }
-    self::$__view->display('install.step.tpl');
+    self::$__view->display('installer.step.tpl');
   }
 
 /**
