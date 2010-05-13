@@ -50,7 +50,6 @@ class Installer {
       require_once (THINKTANK_ROOT_PATH . 'extlib/Smarty-2.6.26/libs/Smarty.class.php');
       require_once 'class.SmartyInstaller.php';
       self::$__view = new SmartyInstaller();
-      self::$__view->assign('title', 'ThinkTank');
       self::$__view->assign('base_url', THINKTANK_BASE_URL);
       self::$__view->assign('favicon', THINKTANK_BASE_URL . 'assets/img/favicon.ico');
       

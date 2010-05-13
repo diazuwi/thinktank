@@ -4,7 +4,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>ThinkTank {$title}</title>
+  <title>ThinkTank :: {$subtitle}</title>
   <link rel="shortcut icon" type="image/x-icon" href="{$facivon}assets/img/favicon.ico">
 
   <!-- custom css -->

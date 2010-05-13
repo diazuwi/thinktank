@@ -14,7 +14,7 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   $installer = Installer::getInstance();
   
   $message = "<p>Config's file, <code>config.inc.php</code>, is not found!</p>";
-  $installer->diePage($message);
+  $installer->diePage($message, 'Error');
 } else {
   // config file exists in THINKTANK_WEBAPP_PATH
   
