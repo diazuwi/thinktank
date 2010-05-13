@@ -1,3 +1,10 @@
+code {
+  font-family: Consolas,Monaco,Courier,monospace;
+}
 #status-bar {
   height: 22px;
+}
+#installer-die {
+  background-color: #FFF;
+  margin-top: 20px;
 }
