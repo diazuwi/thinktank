@@ -2,8 +2,7 @@
 // set up
 chdir("..");
 
-
-require_once ("init.php");
+require_once 'init.php';
 
 session_start();
 $session = new Session();
@@ -27,7 +26,7 @@ if (isset($_POST['changepass']) && $_POST['changepass'] == 'Change password') {
         $od->updatePassword($_SESSION['user'], $cryptpass);
         $successmsg = "Your password has been updated.";
     }
-} 
+}
 
 $s = new SmartyThinkTank();
 $s->caching = 0;
@@ -43,7 +42,11 @@ $s->assign('cfg', $cfg);
 $s->assign('owner', $owner);
 
 // grab instance from session variable
-$i = unserialize($_SESSION['instance']); 
+if (isset($_SESSION['instance'])) {
+    $i = unserialize($_SESSION['instance']);
+} else {
+    $i = '';
+}
 $s->assign('instance', $i);
 
 if ($owner->is_admin) {
@@ -58,8 +61,6 @@ if ($owner->is_admin) {
 $s->assign('instances', $id->getByOwner($owner));
 
 /* Begin plugin-specific configuration handling */
-$cmi = $webapp->getConfigMenu();
-$s->assign('config_menu', $cmi);
 if (!isset($_GET['m']) && isset($_GET['p'])) {
     $active_plugin = $_GET['p'];
 } else {
@@ -73,7 +74,9 @@ if (!isset($_GET['m']) && isset($_GET['p'])) {
     }
 }
 if (isset($active_plugin)) {
-    $webapp->configuration($active_plugin);
+    $pobj = $webapp->getPluginObject($active_plugin);
+    $p = new $pobj;
+    $p->renderConfiguration($s);
     array_push($s->template_dir, 'plugins/'.$active_plugin);
     $s->assign('body', $THINKTANK_CFG['source_root_path'].'webapp/plugins/'.$active_plugin.'/view/'.$active_plugin.'.account.index.tpl');
 }

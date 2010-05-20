@@ -1,18 +1,29 @@
 <?php 
 class Logger {
+    // our singleton instance
+    private static $instance;
     var $log;
-    var $twitter_username;
+    var $network_username;
     
     function __construct($location) {
         $this->log = $this->openFile($location, 'a'); # Append to any prior file
     }
     
-    function setUsername($uname) {
-        $this->twitter_username = $uname;
+    // The singleton method
+    public static function getInstance() {
+        global $THINKTANK_CFG;
+        if (!isset(self::$instance)) {
+            self::$instance = new Logger($THINKTANK_CFG['log_location']);
+        }
+        return self::$instance;
     }
-	
+    
+    function setUsername($uname) {
+        $this->network_username = $uname;
+    }
+    
     function logStatus($status_message, $classname) {
-        $status_signature = date("Y-m-d H:i:s", time())." | ".(string) number_format(round(memory_get_usage() / 1024000, 2), 2)." MB | $this->twitter_username | $classname:";
+        $status_signature = date("Y-m-d H:i:s", time())." | ".(string) number_format(round(memory_get_usage() / 1024000, 2), 2)." MB | $this->network_username | $classname:";
         if (strlen($status_message) > 0) {
             $this->writeFile($this->log, $status_signature.$status_message); # Write status to log
         }
@@ -46,8 +57,5 @@ class Logger {
     function deleteFile($filename) {
         return unlink($filename);
     }
-
-    
 }
-
 ?>

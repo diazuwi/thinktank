@@ -17,7 +17,7 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   $installer->diePage($message);
 } else {
   // config file exists in THINKTANK_WEBAPP_PATH
-  
+
   require_once 'model/class.Config.php';
   require_once 'model/class.Database.php';
   require_once 'model/class.MySQLDAO.php';
@@ -33,9 +33,8 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   require_once 'model/class.Captcha.php';
   require_once 'model/class.Session.php';
   require_once 'model/class.Plugin.php';
-  require_once 'model/class.Channel.php';
-  require_once 'model/class.InstanceChannel.php';
   require_once 'model/class.LoggerSlowSQL.php';
+  require_once 'model/interface.iPlugin.php';
 
   # crawler only
   require_once 'model/class.Logger.php';
@@ -43,6 +42,7 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   # webapp only
   require_once 'model/class.Follow.php';
   require_once 'model/class.Webapp.php';
+
 
   require_once 'config.inc.php';
   

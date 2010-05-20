@@ -9,7 +9,7 @@ chdir("..");
 chdir("..");
 
 
-require_once ("init.php");
+require_once 'init.php';
 
 $s = new SmartyThinkTank();
 
@@ -30,8 +30,8 @@ if (isset($tok['oauth_token']) && isset($tok['oauth_token_secret'])) {
     
     $u = $api->verifyCredentials();
     
-    //	echo "User ID: ". $u['user_id'];
-    //	echo "User name: ". $u['user_name'];
+    //    echo "User ID: ". $u['user_id'];
+    //    echo "User name: ". $u['user_name'];
     $twitter_id = $u['user_id'];
     $tu = $u['user_name'];
     
@@ -90,6 +90,5 @@ if (isset($tok['oauth_token']) && isset($tok['oauth_token_secret'])) {
 $msg .= '<a href="'.$THINKTANK_CFG['site_root_path'].'account/" class="tt-button ui-state-default tt-button-icon-left ui-corner-all"><span class="ui-icon ui-icon-circle-arrow-e"></span>Back to your account</a>';
 
 $s->assign('msg', $msg);
-$s->display('message.tpl');
-
+$s->display($THINKTANK_CFG['source_root_path'].'webapp/plugins/twitter/view/auth.tpl');
 ?>
