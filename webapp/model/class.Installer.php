@@ -127,9 +127,40 @@ class Installer {
   function checkAll() {
     $version_compat = $this->checkVersion();
     $lib_depends = $this->checkDependency();
-    $writeable_permission = $this->checkPermission;
+    $writeable_permission = $this->checkPermission();
     
     return ($version_compat && $lib_depends && $writeable_permission);
+  }
+
+/**
+ * Step 1 - Check requirements
+ * @access private
+ * @return void
+ */  
+  private function __step1() {
+    $php_compat = 0;
+    if ( $this->checkVersion() ) {
+      $php_compat = 1;
+    }
+    self::$__view->assign('php_compat', $php_compat);
+    self::$__view->assign('libs', self::checkDependency());
+    self::$__view->assign('permission', self::checkPermission());
+    $writeable_directories = array(
+      'logs' => THINKTANK_ROOT_PATH . 'logs',
+      'compiled_view' => self::$__view->compile_dir,
+      'cache' => self::$__view->compile_dir . 'cache'
+    );
+    self::$__view->assign('writeable_directories', $writeable_directories);
+    self::$__view->assign('subtitle', 'Requirements Check');
+  }
+
+/**
+ * Step 2 - Database setup
+ * @access private
+ * @return void
+ */  
+  private function __step2() {
+    self::$__view->assign('subtitle', 'Setup Database');
   }
   
 /**
@@ -144,33 +175,16 @@ class Installer {
 /**
  * Installation steps page
  * @param int $step Current step
+ * @return void
  */
   function installPage($step) {
-    switch ($step) {
-      case 1:
-        $php_compat = 0;
-        if ( $this->checkVersion() ) {
-          $php_compat = 1;
-        }
-        self::$__view->assign('php_compat', $php_compat);
-        self::$__view->assign('libs', self::checkDependency());
-        self::$__view->assign('permission', self::checkPermission());
-        $writeable_directories = array(
-          'logs' => THINKTANK_ROOT_PATH . 'logs',
-          'compiled_view' => self::$__view->compile_dir,
-          'cache' => self::$__view->compile_dir . 'cache'
-        );
-        self::$__view->assign('writeable_directories', $writeable_directories);
-        self::$__view->assign('subtitle', 'Requirements Check');
-        break;
-      case 2:
-        break;
-      case 3:
-        break;
-      case 4:
-        break;
+    $methodName = '__step' . $step;
+    if ( method_exists(__CLASS__, $methodName) ) {
+      self::$methodName();
+    } else {
+      self::__step1();
     }
-    self::$__view->display('installer.step.tpl');
+    self::$__view->display('installer.step.' . $step . '.tpl');
   }
 
 /**

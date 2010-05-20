@@ -44,3 +44,17 @@ code {
   border: 1px solid #999;
   background-color: #ccc;
 }
+form.input label {
+  font-size:24px;
+  line-height:2.2em;
+}
+form.input input {
+  font-size:1.4em;
+  margin:0.5em 0 0;
+  width:345px;
+}
+form.input .input_information {
+  display: block;
+  font-style: italic;
+  color: #999;
+}
