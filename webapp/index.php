@@ -2,11 +2,9 @@
 session_start();
 
 if (!isset($_SESSION['user'])) {
-    require_once('public.php');
-    die();
-}
-else {
-    require_once("init.php");
+    require_once 'public.php';
+} else {
+    require_once 'init.php';
     $od = new OwnerDAO($db);
     $owner = $od->getByEmail($_SESSION['user']);
     $id = new InstanceDAO($db);
@@ -24,8 +22,8 @@ else {
     } else {
         $i = $id->getFreshestByOwnerId($owner->id);
         if ( !isset($i) && $i == null ) {
-            $s->assign('msg', 'You have no Twitter or Facebook accounts configured. <a href="'.$THINKTANK_CFG['site_root_path'].'account/?p=twitter">Set up an account here&rarr;</a>');
-            $s->display('message.tpl');
+            $s->assign('msg', 'You have no Twitter accounts configured. <a href="'.$THINKTANK_CFG['site_root_path'].'account/?p=twitter">Set up an account&rarr;</a>');
+            $s->display('index.tpl');
             $db->closeConnection($conn);
             die;
         }
@@ -50,23 +48,23 @@ else {
         $s->assign('instances', $id->getByOwner($owner));
         $s->assign('cfg', $cfg);
 
-        $total_follows_with_errors = $fd->getTotalFollowsWithErrors($cfg->twitter_user_id);
+        $total_follows_with_errors = $fd->getTotalFollowsWithErrors($cfg->network_user_id);
         $s->assign('total_follows_with_errors', $total_follows_with_errors);
 
-        $total_follows_with_full_details = $fd->getTotalFollowsWithFullDetails($cfg->twitter_user_id);
+        $total_follows_with_full_details = $fd->getTotalFollowsWithFullDetails($cfg->network_user_id);
         $s->assign('total_follows_with_full_details', $total_follows_with_full_details);
 
-        $total_follows_protected = $fd-> getTotalFollowsProtected($cfg->twitter_user_id);
+        $total_follows_protected = $fd-> getTotalFollowsProtected($cfg->network_user_id);
         $s->assign('total_follows_protected', $total_follows_protected);
 
         //TODO: Get friends with full details and also friends with errors, same as with followers
-        $total_friends_loaded = $fd->getTotalFriends($cfg->twitter_user_id);
+        $total_friends_loaded = $fd->getTotalFriends($cfg->network_user_id);
         $s->assign('total_friends', $total_friends_loaded);
 
-        $total_friends_with_errors = $fd->getTotalFriendsWithErrors($cfg->twitter_user_id);
+        $total_friends_with_errors = $fd->getTotalFriendsWithErrors($cfg->network_user_id);
         $s->assign('total_friends_with_errors', $total_friends_with_errors);
 
-        $total_friends_protected = $fd->getTotalFriendsProtected($cfg->twitter_user_id);
+        $total_friends_protected = $fd->getTotalFriendsProtected($cfg->network_user_id);
         $s->assign('total_friends_protected', $total_friends_protected);
 
         //Percentages
