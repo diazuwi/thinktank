@@ -26,12 +26,3 @@
           <h2>Ask your friends</h2>
     </div>
   </div>
-  <div id="installer-die" class="container_24 round-all">
-    <div class="clearfix prepend_20 append_20">
-      <div class="grid_22 push_1 clearfix">
-      {$message}
-      </div>
-    </div>
-  </div>
-</body>
-</html>
