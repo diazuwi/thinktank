@@ -4,14 +4,43 @@ code {
 #status-bar {
   height: 22px;
 }
-#installer-die {
+#installer-die, #installer-page {
   background-color: #FFF;
   margin-top: 20px;
 }
-#create-config-file {
+.next_step {
   width: 250px;
   margin-top: 20px;
 }
-#create-config-file a {
+.next_step a {
   display: block;
+}
+span.label, span.value {
+  font-size: 24px;
+}
+.label.no {
+  color: red;
+}
+.value.yes {
+  color: #0060E0;
+  background: url(../img/yes.png) no-repeat 0 50%;
+  display: block;
+  min-height: 32px;
+  padding-left: 40px;
+}
+.value.no {
+  color: red;
+  background: url(../img/no.png) no-repeat 0 50%;
+  display: block;
+  min-height: 32px;
+  padding-left: 40px;
+}
+.error_message {
+  border: 2px solid red;
+  padding: 10px;
+  background-color: #FFCFCF;
+}
+code {
+  border: 1px solid #999;
+  background-color: #ccc;
 }

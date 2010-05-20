@@ -47,7 +47,8 @@ class Installer {
       self::$__instance = new Installer();
       
       // instantiate SmartyInstaller 
-      require_once (THINKTANK_ROOT_PATH . 'extlib/Smarty-2.6.26/libs/Smarty.class.php');
+      require_once (THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
+        'libs' . DS . 'Smarty.class.php');
       require_once 'class.SmartyInstaller.php';
       self::$__view = new SmartyInstaller();
       self::$__view->assign('base_url', THINKTANK_BASE_URL);
@@ -55,7 +56,7 @@ class Installer {
       
       // get required version of php and mysql
       // and set current version
-      require_once (THINKTANK_WEBAPP_PATH . 'install/version.php');
+      require_once (THINKTANK_WEBAPP_PATH . 'install' . DS . 'version.php');
       self::$__requiredVersion = array(
         'php' => $THINKTANK_VERSION_REQUIRED['php'],
         'mysql' => $THINKTANK_VERSION_REQUIRED['mysql']
@@ -81,22 +82,44 @@ class Installer {
 
 /**
  * Check GD and cURL
- * @return bool True when libs dependency available
+ * @return array
  */
   function checkDependency() {
-    $ret = false;
+    $ret = array('curl' => false, 'gd' => false);
     // check curl
-    if ( !function_exists('curl_exec') ) {
-      
+    if ( extension_loaded('curl') && function_exists('curl_exec') ) {
+      $ret['curl'] = true;
     }
     
     // check GD
+    if ( extension_loaded('gd') && function_exists('gd_info') ) {
+      $ret['gd'] = true;
+    }
     
     return $ret;
   }
-  
+
+/**
+ * Check if log and template directories are writeable
+ * @access public
+ * @return array
+ */  
   function checkPermission() {
-    $ret = false;
+    $ret = array(
+      'logs' => false, 'compiled_view' => false, 'cache' => false
+    );
+    
+    if ( is_writable(THINKTANK_ROOT_PATH . 'logs') ) {
+      $ret['logs'] = true;
+    }
+    
+    if ( is_writable(self::$__view->compile_dir) ) {
+      $ret['compiled_view'] = true;
+    }
+    
+    if ( is_writable(self::$__view->compile_dir . 'cache') ) {
+      $ret['cache'] = true;
+    }
     
     return $ret;
   }
@@ -130,6 +153,14 @@ class Installer {
           $php_compat = 1;
         }
         self::$__view->assign('php_compat', $php_compat);
+        self::$__view->assign('libs', self::checkDependency());
+        self::$__view->assign('permission', self::checkPermission());
+        $writeable_directories = array(
+          'logs' => THINKTANK_ROOT_PATH . 'logs',
+          'compiled_view' => self::$__view->compile_dir,
+          'cache' => self::$__view->compile_dir . 'cache'
+        );
+        self::$__view->assign('writeable_directories', $writeable_directories);
         break;
       case 2:
         break;

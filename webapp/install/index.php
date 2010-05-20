@@ -25,5 +25,5 @@ switch ($step) {
     break;
 }
 
-$installer->page($step);
+$installer->installPage($step);
 ?>
