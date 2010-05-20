@@ -161,6 +161,7 @@ class Installer {
           'cache' => self::$__view->compile_dir . 'cache'
         );
         self::$__view->assign('writeable_directories', $writeable_directories);
+        self::$__view->assign('subtitle', 'Requirements Check');
         break;
       case 2:
         break;
