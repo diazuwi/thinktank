@@ -46,6 +46,8 @@ class Installer {
     if ( self::$__instance == null ) {
       self::$__instance = new Installer();
       
+      spl_autoload_register( array('Loader', 'load') );
+      
       // instantiate SmartyInstaller 
       require_once (THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
         'libs' . DS . 'Smarty.class.php');
@@ -275,15 +277,30 @@ class InstallerError extends Exception {
 }
 
 class Loader {
+  var $lookupPath = array(
+    '', THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
+    'libs' . DS, THINKTANK_WEBAPP_PATH . 'install' . DS
+  );
+  
   public static function load($class) {
     if ( class_exists($class, FALSE) ) {
       return;
     }
     
     $file = 'class.' . $class . '.php';
-    if ( !file_exists($file) ) {
+    $file_found = false;
+    
+    foreach ( $lookupPath as $path ) {
+      if ( file_exists($path . $file) ) {
+        $file_found = true;
+        break;
+      }
+    }
+    
+    if ( !$file_found ) {
       throw new InstallerError('Error: File ' . $file . ' not found.');
     }
+    
     require $file;
     
     if ( !class_exists($class, FALSE) ) {
