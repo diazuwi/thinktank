@@ -270,4 +270,25 @@ class Installer {
     die();
   }
 }
+
+class InstallerError extends Exception {
+}
+
+class Loader {
+  public static function load($class) {
+    if ( class_exists($class, FALSE) ) {
+      return;
+    }
+    
+    $file = 'class.' . $class . '.php';
+    if ( !file_exists($file) ) {
+      throw new InstallerError('Error: File ' . $file . ' not found.');
+    }
+    require $file;
+    
+    if ( !class_exists($class, FALSE) ) {
+      throw new InstallerError('Error: Class ' . $class . ' not found.');
+    }
+  }
+}
 ?>
