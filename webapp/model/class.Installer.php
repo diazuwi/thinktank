@@ -181,6 +181,11 @@ class Installer {
  * @return void
  */  
   private function __step2() {
+    self::$__view->assign('db_name', 'thinktank');
+    self::$__view->assign('db_user', 'username');
+    self::$__view->assign('db_passwd', 'password');
+    self::$__view->assign('db_host', 'localhost');
+    self::$__view->assign('db_prefix', 'tt_');
     self::$__view->assign('subtitle', 'Setup Database');
   }
   
@@ -219,7 +224,7 @@ class Installer {
  * @param int $step Current step
  * @return void
  */
-  function installPage($step) {
+  function installPage($step = 1) {
     $methodName = '__step' . $step;
     if ( !method_exists(__CLASS__, $methodName) ) {
       $step = 1;
