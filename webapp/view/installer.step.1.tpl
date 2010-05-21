@@ -12,6 +12,7 @@
             {/if}
           </div>
         </div>
+        
         <div class="clearfix append_20">
           <div class="grid_6 prefix_5 right"><span class="label">cURL enabled</span></div>
           <div class="grid_8 prefix_1 left">
@@ -22,6 +23,7 @@
             {/if}
           </div>
         </div>
+        
         <div class="clearfix append_20">
           <div class="grid_6 prefix_5 right"><span class="label">GD lib installed</span></div>
           <div class="grid_8 prefix_1 left">
@@ -32,6 +34,7 @@
             {/if}
           </div>
         </div>
+        
         <div class="clearfix append_20">
           <div class="grid_6 prefix_5 right">
             {if $permission.logs && $permission.compiled_view && $permission.cache}
@@ -48,6 +51,7 @@
             {/if}
           </div>
         </div>
+        
         {if $permission.logs && $permission.compiled_view && $permission.cache}
         <div class="clearfix">
           <div class="grid_10 prefix_8 left">

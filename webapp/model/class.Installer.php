@@ -133,6 +133,27 @@ class Installer {
   }
 
 /**
+ * Generate random password for step 4
+ * @param int $length the length of generated random password
+ * @access private
+ * @return string $pass random password
+ */  
+  private function __generatePassword($length = 8) {
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
+    srand( (double)microtime()*1000000 );
+    $i = 0;
+    $pass = '';
+    
+    while ($i++ <= $length) {
+      $num   = rand() % 64;
+      $tmp   = substr($chars, $num, 1);
+      $pass .= $tmp;
+    }
+    
+    return $pass;
+  }
+
+/**
  * Step 1 - Check requirements
  * @access private
  * @return void
@@ -164,6 +185,27 @@ class Installer {
   }
   
 /**
+ * Step 3 - Configure Site
+ * @access private
+ * @return void
+ */  
+  private function __step3() {
+    self::$__view->assign('subtitle', 'Configure Site');
+  }
+
+/**
+ * Step 4 - Finish
+ * @access private
+ * @return void
+ */  
+  private function __step4() {
+    self::$__view->assign('username', 'Dwi Widiastuti');
+    self::$__view->assign('password', self::__generatePassword());
+    self::$__view->assign('login_url', THINKTANK_WEBAPP_PATH . 'session/login.php');
+    self::$__view->assign('subtitle', 'Finish');
+  }
+  
+/**
  * Get error messages.
  * 
  * @access public
@@ -179,11 +221,11 @@ class Installer {
  */
   function installPage($step) {
     $methodName = '__step' . $step;
-    if ( method_exists(__CLASS__, $methodName) ) {
-      self::$methodName();
-    } else {
-      self::__step1();
+    if ( !method_exists(__CLASS__, $methodName) ) {
+      $step = 1;
+      $methodName = '__step1';
     }
+    self::$methodName();
     self::$__view->display('installer.step.' . $step . '.tpl');
   }
 

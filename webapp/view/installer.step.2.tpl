@@ -2,7 +2,7 @@
   <div id="installer-page" class="container_24 round-all">
     <div class="clearfix prepend_20 append_20">
       <div class="grid_22 push_1 clearfix">
-        <form class="input" name="form1" method="post">
+        <form class="input" name="form1" method="post" action="index.php?step=3">
           <div class="clearfix append_20">
             <div class="grid_5 prefix_3 right">
               <label>Database Name</label>

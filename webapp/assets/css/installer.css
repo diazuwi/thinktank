@@ -40,6 +40,12 @@ span.label, span.value {
   padding: 10px;
   background-color: #FFCFCF;
 }
+.success_message {
+  border: 2px solid green;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #E4FFCF;
+}
 code {
   border: 1px solid #999;
   background-color: #ccc;
