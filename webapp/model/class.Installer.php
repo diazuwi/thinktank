@@ -133,6 +133,20 @@ class Installer {
   }
 
 /**
+ * Check database connection
+ * @access private
+ * @return array $ret
+ */
+  private function __checkDbConnection() {
+    $ret = array(
+      'access' => false, 'existent' => false,
+      'priviledge' => false
+    );
+    
+    return $ret;
+  } 
+
+/**
  * Generate random password for step 4
  * @param int $length the length of generated random password
  * @access private
