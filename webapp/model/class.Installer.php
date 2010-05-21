@@ -277,16 +277,15 @@ class InstallerError extends Exception {
 }
 
 class Loader {
-  var $lookupPath = array(
-    '', THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
-    'libs' . DS, THINKTANK_WEBAPP_PATH . 'install' . DS
-  );
-  
   public static function load($class) {
     if ( class_exists($class, FALSE) ) {
       return;
     }
     
+    $lookupPath = array(
+      '', THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
+      'libs' . DS, THINKTANK_WEBAPP_PATH . 'install' . DS
+    );
     $file = 'class.' . $class . '.php';
     $file_found = false;
     
