@@ -29,7 +29,8 @@
   <div id="installer-die" class="container_24 round-all">
     <div class="clearfix prepend_20 append_20">
       <div class="grid_22 push_1 clearfix">
-      {$message}
+        <h2 class="clearfix error_title">{$subtitle}</h2>
+        {$message}
       </div>
     </div>
   </div>

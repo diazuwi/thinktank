@@ -2,7 +2,7 @@
   <div id="installer-page" class="container_24 round-all">
     <div class="clearfix prepend_20 append_20">
       <div class="grid_22 push_1 clearfix">
-        <h2 class="clearfix stepTitle">Requirements Check</h2>
+        <h2 class="clearfix step_title">Requirements Check</h2>
         {if $permission.logs && $permission.compiled_view && $permission.cache && $php_compat && $libs.curl && $libs.gd}
         <div class="clearfix success_message">
           <strong>Great!</strong> Your system is met ThinkTank's requirements.

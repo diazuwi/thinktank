@@ -58,11 +58,15 @@ code {
   border: 1px solid #999;
   background-color: #ccc;
 }
-.stepTitle {
+.step_title, .error_title {
   font-size: 26px;
   color: #FF9900;
   border-bottom: 1px solid #FF9900;
   margin-bottom: 10px;
+}
+.error_title {
+  color: red;
+  border-color: red;
 }
 form.input label {
   font-size:24px;
