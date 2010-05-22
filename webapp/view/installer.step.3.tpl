@@ -5,7 +5,7 @@
           <div class="clearfix success_message">
             <strong>Congrulations!</strong> ThinkTank has been installed.
             Please login with account provided below. This account information
-            also already sent to admin@diazuwi.web.id
+            also already sent to {$username}
           </div>
         
           <div class="clearfix append_20">
