@@ -483,8 +483,10 @@ class Installer {
         $message .= htmlentities($line);
       }
       $message .= '</textarea><br>';
-      $message .= "<p>After you've done that, click the Next Step &raquo;</p><br>";
-      $message .= 
+      $message .= "<p>After you've done that, click the Next Step &raquo;</p>";
+      $message .= '<div class="next_step tt-button ui-state-default ui-priority-secondary ui-corner-all">';
+      $message .= '<a href="index?step=3">Next Step &raquo;</a>';
+      $message .= '</div>';
       
       self::diePage($message, 'File Configuration Error');
     }
