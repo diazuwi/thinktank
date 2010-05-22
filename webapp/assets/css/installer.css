@@ -36,15 +36,23 @@ span.label, span.value {
   padding-left: 40px;
 }
 .error_message {
-  border: 2px solid red;
+  border: 2px solid #990000;
   padding: 10px;
-  background-color: #FFCFCF;
+  margin-bottom: 20px;
+  background-color: #CF3333;
+  color: #FFF;
 }
 .success_message {
   border: 2px solid green;
   padding: 10px;
   margin-bottom: 20px;
   background-color: #E4FFCF;
+}
+.info_message {
+  background-color:#FFFFEE;
+  border:1px solid #EEEE00;
+  padding: 10px;
+  margin-bottom: 20px;
 }
 code {
   border: 1px solid #999;

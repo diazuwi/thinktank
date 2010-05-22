@@ -4,6 +4,10 @@
       <div class="grid_22 push_1 clearfix">
         <form class="input" name="form1" method="post" action="index.php?step=3">
           <h2 class="clearfix stepTitle">Database Setup</h2>
+          <div class="clearfix info_message">
+            <strong>My Dear!</strong> ThinkTank need database credentials information, so please fill
+            input fields below with valid values. This information will be written into config.inc.php
+          </div>
           <div class="clearfix append_20">
             <div class="grid_5 prefix_3 right">
               <label>Database Name</label>
@@ -55,6 +59,10 @@
           </div>
           
           <h2 class="clearfix stepTitle">Site Configuration</h2>
+          <div class="clearfix info_message">
+            <strong>My Dear!</strong> ThinkTank need a name and your email (for administrator). 
+            This information will be written into config.inc.php
+          </div>
           <div class="clearfix append_20">
             <div class="grid_5 prefix_3 right">
               <label>Site Name</label>

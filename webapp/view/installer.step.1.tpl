@@ -8,6 +8,10 @@
           <strong>Great!</strong> Your system is met ThinkTank's requirements.
           Click on the <strong>Next Step &raquo;</strong> button below to proceed the next step
         </div>
+        {else}
+        <div class="clearfix error_message">
+          <strong>Ups!</strong> Something goes wrong, read the hints below!
+        </div>
         {/if}
         <div class="clearfix append_20">
           <div class="grid_6 prefix_5 right"><span class="label">PHP Version >= 5.2</span></div>
@@ -68,7 +72,7 @@
           </div>
         </div>
         {else}
-        <div class="clearfix append_20 error_message">
+        <div class="clearfix append_20 info_message">
         <p>Make sure the following directories are writeable by the web server:</p>
         <p><code>{$writeable_directories.logs}</code></p>
         <p><code>{$writeable_directories.compiled_view}</code></p>
