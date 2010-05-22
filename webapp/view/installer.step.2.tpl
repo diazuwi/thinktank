@@ -28,7 +28,7 @@
               <label>Password</label>
             </div>
             <div class="grid_10 prefix_1 left">
-              <input type="text" name="db_user" id="db_passwd"{if isset($db_passwd)} value="{$db_passwd}"{/if}>
+              <input type="text" name="db_passwd" id="db_passwd"{if isset($db_passwd)} value="{$db_passwd}"{/if}>
               <span class="input_information">Your MySQL password.</span>
             </div>
           </div>

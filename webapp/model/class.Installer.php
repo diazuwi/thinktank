@@ -1,5 +1,20 @@
 <?php
 class InstallerError extends Exception {
+  function showError() {
+    $title = '';
+    $message = '';
+    switch ( $this->getCode() ) {
+      case Installer::ERROR_FILE_NOT_FOUND:
+      case Installer::ERROR_CLASS_NOT_FOUND:
+      case Installer::ERROR_DB_CONNECT:
+        $title = 'Database Error';
+      case Installer::ERROR_DB_SELECT:
+        $title = 'Database Error';
+        break;
+    }
+    
+    Installer::diePage($this->getMessage(), $title);
+  }
 }
 
 class Loader {
@@ -66,6 +81,11 @@ class Installer {
  * @access private
  */
   private $__errorMessages = array();
+  
+  const ERROR_FILE_NOT_FOUND = 1;
+  const ERROR_CLASS_NOT_FOUND = 2;
+  const ERROR_DB_CONNECT = 3;
+  const ERROR_DB_SELECT = 4;
   
 /**
  * Stores current version of ThinkTank
@@ -184,17 +204,32 @@ class Installer {
   }
 
 /**
- * Check database connection
+ * Check database
+ * @param array $params database credentials
  * @access private
- * @return array $ret
+ * @return void
  */
-  private function __checkDbConnection() {
-    $ret = array(
-      'access' => false, 'existent' => false,
-      'priviledge' => false
-    );
+  private function __checkDb($params) {
+    $c = @mysql_connect($params['host'], $params['user'], $params['passwd'], true);
+    if (!$c) {
+      throw new InstallerError(
+        '<p>Failed establishing database connection. Probably either your username, ' .
+        '<code>' . $params['user'] . '</code>, and password, <code>' . $params['passwd'] .
+        '</code>, you have provided are incorrect or we can\'t connect the' .
+        'database server at <code>' . $params['host'] . '</code>' .
+        '</p>' ,
+        self::ERROR_DB_CONNECT
+      );
+    }
     
-    return $ret;
+    if (!@mysql_select_db($params['name'], $c)) {
+      throw new InstallerError(
+        "<p>We were able to connect to the database server (which means " .
+        "your username and password is okay) but not able to select the <code>" . 
+        $params['name'] . "</code> database.</p> ", 
+        self::ERROR_DB_SELECT
+      );
+    }
   } 
 
 /**
@@ -260,6 +295,19 @@ class Installer {
  * @return void
  */  
   private function __step3() {
+    // trim each posted value
+    $db['name'] = trim($_POST['db_name']);
+    $db['user'] = trim($_POST['db_user']);
+    $db['passwd'] = trim($_POST['db_passwd']);
+    $db['host'] = trim($_POST['db_host']);
+    $db['prefix'] = trim($_POST['db_prefix']);
+    
+    try {
+      self::__checkDb($db);
+    } catch (InstallerError $e) {
+      $e->showError();
+    }
+    
     self::$__view->assign('subtitle', 'Configure Site');
   }
 
