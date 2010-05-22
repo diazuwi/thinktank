@@ -2,7 +2,6 @@
 class InstallerError extends Exception {
   function showError() {
     $title = '';
-    $message = '';
     switch ( $this->getCode() ) {
       case Installer::ERROR_FILE_NOT_FOUND:
       case Installer::ERROR_CLASS_NOT_FOUND:
@@ -17,6 +16,8 @@ class InstallerError extends Exception {
       case Installer::ERROR_SITE_EMAIL:
         $title = 'Invalid Site Email';
         break;
+      case Installer::ERROR_CONFIG_SAMPLE_MISSING:
+        $title = 'Missing Sample Configuration File';
     }
     
     Installer::diePage($this->getMessage(), $title);
@@ -94,6 +95,7 @@ class Installer {
   const ERROR_DB_SELECT = 4;
   const ERROR_SITE_NAME = 5;
   const ERROR_SITE_EMAIL = 6;
+  const ERROR_CONFIG_SAMPLE_MISSING = 7;
   
 /**
  * Stores current version of ThinkTank
@@ -291,6 +293,22 @@ class Installer {
   }
 
 /**
+ * Check if sample config (config.sample.inc.php) exists
+ * @param string $file absolute file path
+ * @access private
+ * @return void
+ */
+  private function __checkSampleConfig($file) {
+    if ( !file_exists($file) ) {
+      throw new InstallerError(
+        '<p>Sorry, ThinkTank Installer need a config.sample.inc.php file to work from. '.
+        'Please re-upload this file from your ThinkTank installation.</p>',
+        self::ERROR_CONFIG_SAMPLE_MISSING
+      );
+    }
+  }
+
+/**
  * Step 1 - Check requirements
  * @access private
  * @return void
@@ -363,7 +381,85 @@ class Installer {
       $e->showError();
     }
     
-    // writing configuration file
+    // check sample configuration file
+    $sample_config_filename = THINKTANK_WEBAPP_PATH . 'config.sample.inc.php';
+    try {
+      self::__checkSampleConfig($sample_config_filename);
+    } catch (InstallerError $e) {
+      $e->showError();
+    }
+    
+    // read sample configuration file and replace some lines
+    $sample_config = file($sample_config_filename);
+    foreach ($sample_config as $line_num => $line) {
+      switch ( substr($line, 14, 30) ) {
+        case "['app_title']                 ":
+          $sample_config[$line_num] = str_replace("'ThinkTank'", "'$site_name'", $line);
+          break;
+        case "['log_location']              ":
+          $sample_config[$line_num] = str_replace(
+            "'/your-server-path-to/thinktank/logs/crawler.log'", 
+            "'" . THINKTANK_ROOT_PATH . "logs/crawler.log'", $line
+          );
+          break;
+        case "['sql_log_location']          ":
+          $sample_config[$line_num] = str_replace(
+            "'/your-server-path-to/thinktank/logs/sql.log'", 
+            "'" . THINKTANK_ROOT_PATH . "logs/sql.log'", $line
+          );
+          break;
+        case "['site_root_path']            ":
+          $sample_config[$line_num] = str_replace(
+            "'/'", "'" . THINKTANK_BASE_URL . "'", $line
+          );
+          break;
+        case "['source_root_path']          ":
+          $sample_config[$line_num] = str_replace(
+            "'/your-server-path-to/thinktank/'",
+            "'" . THINKTANK_ROOT_PATH . "'", $line
+          );
+          break;
+        case "['db_host']                   ":
+          $sample_config[$line_num] = str_replace(
+            "'localhost'", "'" . $db['host'] . "'", $line
+          );
+          break;
+        case "['db_user']                   ":
+          $sample_config[$line_num] = str_replace(
+            "'your_database_username'", "'" . $db['user'] . "'", $line
+          );
+          break;
+        case "['db_password']               ":
+          $sample_config[$line_num] = str_replace(
+            "'your_database_password'", "'" . $db['passwd'] . "'", $line
+          );
+          break;
+        case "['db_name']                   ":
+          $sample_config[$line_num] = str_replace(
+            "'your_thinktank_database_name'", "'" . $db['name'] . "'", $line
+          );
+          break;
+        case "['table_prefix']              ":
+          $sample_config[$line_num] = str_replace(
+            "'tt_'", "'" . $db['prefix'] . "'", $line
+          );
+          break;
+      }
+    } // end foreach
+    
+    if ( !is_writable(THINKTANK_WEBAPP_PATH) ) {
+      $message  = "<p>ThinkTank couldn't write <code>config.sample.inc.php</code> file!</p>";
+      $message .= "<p>You can create the <code>config.sample.inc.php</code> manually and paste the following text into it.</p><br>";
+      $message .= '<textarea cols="120" rows="15">';
+      foreach ($sample_config as $line) {
+        $message .= htmlentities($line);
+      }
+      $message .= '</textarea><br>';
+      $message .= "<p>After you've done that, click the Next Step &raquo;</p><br>";
+      $message .= 
+      
+      self::diePage($message, 'File Configuration Error');
+    }
     
     self::$__view->assign('username', $site_email);
     self::$__view->assign('password', self::__generatePassword());
