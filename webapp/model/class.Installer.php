@@ -237,7 +237,7 @@ class Installer {
  * @param string $email Email to be validated
  * @return mixed string of $email when valid and false when $email is not valid
  */  
-  private __checkValidEmail($email) {
+  private function __checkValidEmail($email) {
   }
 
 /**
@@ -284,7 +284,7 @@ class Installer {
   }
 
 /**
- * Step 2 - Database setup
+ * Step 2 - Setup database and site configuration
  * @access private
  * @return void
  */  
@@ -294,7 +294,9 @@ class Installer {
     self::$__view->assign('db_passwd', 'password');
     self::$__view->assign('db_host', 'localhost');
     self::$__view->assign('db_prefix', 'tt_');
-    self::$__view->assign('subtitle', 'Setup Database');
+    self::$__view->assign('site_name', 'My ThinkTank');
+    self::$__view->assign('site_email', 'username@example.com');
+    self::$__view->assign('subtitle', 'Setup Database and Site Configuration');
   }
   
 /**

@@ -3,6 +3,7 @@
     <div class="clearfix prepend_20 append_20">
       <div class="grid_22 push_1 clearfix">
         <form class="input" name="form1" method="post" action="index.php?step=3">
+          <h2 class="clearfix stepTitle">Database Setup</h2>
           <div class="clearfix append_20">
             <div class="grid_5 prefix_3 right">
               <label>Database Name</label>
@@ -50,6 +51,27 @@
             <div class="grid_10 prefix_1 left">
               <input type="text" name="db_prefix" id="db_prefix"{if isset($db_prefix)} value="{$db_prefix}"{/if}>
               <span class="input_information">Prefix of your table name</span>
+            </div>
+          </div>
+          
+          <h2 class="clearfix stepTitle">Site Configuration</h2>
+          <div class="clearfix append_20">
+            <div class="grid_5 prefix_3 right">
+              <label>Site Name</label>
+            </div>
+            <div class="grid_10 prefix_1 left">
+              <input type="text" name="site_name" id="site_name"{if isset($site_name)} value="{$site_name}"{/if}>
+              <span class="input_information">The name of your ThinkTank site.</span>
+            </div>
+          </div>
+          
+          <div class="clearfix append_20">
+            <div class="grid_5 prefix_3 right">
+              <label>Your E-mail</label>
+            </div>
+            <div class="grid_10 prefix_1 left">
+              <input type="text" name="site_email" id="site_email"{if isset($site_email)} value="{$site_email}"{/if}>
+              <span class="input_information">This will be the email address of the ThinkTank site administrator.</span>
             </div>
           </div>
           

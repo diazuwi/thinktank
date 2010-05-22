@@ -50,6 +50,12 @@ code {
   border: 1px solid #999;
   background-color: #ccc;
 }
+.stepTitle {
+  font-size: 26px;
+  color: #FF9900;
+  border-bottom: 1px solid #FF9900;
+  margin-bottom: 10px;
+}
 form.input label {
   font-size:24px;
   line-height:2.2em;
