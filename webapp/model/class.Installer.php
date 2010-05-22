@@ -11,6 +11,12 @@ class InstallerError extends Exception {
       case Installer::ERROR_DB_SELECT:
         $title = 'Database Error';
         break;
+      case Installer::ERROR_SITE_NAME:
+        $title = 'Invalid Site Name';
+        break;
+      case Installer::ERROR_SITE_EMAIL:
+        $title = 'Invalid Site Email';
+        break;
     }
     
     Installer::diePage($this->getMessage(), $title);
@@ -86,6 +92,8 @@ class Installer {
   const ERROR_CLASS_NOT_FOUND = 2;
   const ERROR_DB_CONNECT = 3;
   const ERROR_DB_SELECT = 4;
+  const ERROR_SITE_NAME = 5;
+  const ERROR_SITE_EMAIL = 6;
   
 /**
  * Stores current version of ThinkTank
@@ -233,11 +241,32 @@ class Installer {
   }
 
 /**
+ * Validate Site Name
+ * @param string $sitename Site name to check
+ * @access private
+ * @return bool
+ */
+  private function __checkSiteName($sitename = '') {
+    if ( empty($sitename) ) {
+      throw new InstallerError(
+        "<p>Please provide valid site name.</p>",
+        self::ERROR_SITE_NAME
+      );
+    }
+  }
+
+/**
  * Validate email
  * @param string $email Email to be validated
  * @return mixed string of $email when valid and false when $email is not valid
  */  
   private function __checkValidEmail($email) {
+    if ( !eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $email) ) {
+      throw new InstallerError(
+        "<p>Please provide valid email.</p>",
+        self::ERROR_SITE_EMAIL
+      );
+    }
   }
 
 /**
@@ -301,7 +330,7 @@ class Installer {
   }
   
 /**
- * Step 3 - Finish
+ * Step 3 - Populate Database and Finishing
  * @access private
  * @return void
  */  
@@ -320,6 +349,21 @@ class Installer {
     }
     
     $site_email = trim($_POST['site_email']);
+    $site_name = trim($_POST['site_name']);
+    
+    try {
+      self::__checkSiteName($site_name);
+      
+      try {
+        self::__checkValidEmail($site_email);
+      } catch (InstallerError $e) {
+        $e->showError();
+      }
+    } catch (InstallerError $e) {
+      $e->showError();
+    }
+    
+    // writing configuration file
     
     self::$__view->assign('username', $site_email);
     self::$__view->assign('password', self::__generatePassword());
