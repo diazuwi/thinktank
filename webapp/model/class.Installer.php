@@ -230,7 +230,15 @@ class Installer {
         self::ERROR_DB_SELECT
       );
     }
-  } 
+  }
+
+/**
+ * Validate email
+ * @param string $email Email to be validated
+ * @return mixed string of $email when valid and false when $email is not valid
+ */  
+  private __checkValidEmail($email) {
+  }
 
 /**
  * Generate random password for step 4
