@@ -2,33 +2,38 @@
   <div id="installer-page" class="container_24 round-all">
     <div class="clearfix prepend_20 append_20">
       <div class="grid_22 push_1 clearfix">
-        <form class="input" name="form1" method="post" action="index.php?step=4">
+          <div class="clearfix success_message">
+            <strong>Congrulations!</strong> ThinkTank has been installed.
+            Please login with account provided below. This account information
+            also already sent to admin@diazuwi.web.id
+          </div>
+        
           <div class="clearfix append_20">
-            <div class="grid_5 prefix_3 right">
-              <label>Site Name</label>
+            <div class="grid_6 prefix_5 right">
+              <span class="label">Username</span>
             </div>
-            <div class="grid_10 prefix_1 left">
-              <input type="text" name="site_name" id="db_name"{if isset($site_name)} value="{$site_name}"{/if}>
-              <span class="input_information">The name of your ThinkTank site.</span>
+            <div class="grid_8 prefix_1 left">
+              <span class="value">{$username}</span>
             </div>
           </div>
           
           <div class="clearfix append_20">
-            <div class="grid_5 prefix_3 right">
-              <label>Your E-mail</label>
+            <div class="grid_6 prefix_5 right">
+              <span class="label">Password</span>
             </div>
-            <div class="grid_10 prefix_1 left">
-              <input type="text" name="site_email" id="site_email"{if isset($site_email)} value="{$site_email}"{/if}>
-              <span class="input_information">This will be the email address of the ThinkTank site administrator.</span>
+            <div class="grid_8 prefix_1 left">
+              <span class="value">{$password}</span>
             </div>
           </div>
           
           <div class="clearfix append_20">
-            <div class="grid_10 prefix_9 left">
-              <input type="submit" name="Submit" class="tt-button ui-state-default ui-priority-secondary ui-corner-all" value="Next Step &raquo">
+            <div class="grid_10 prefix_8 left">
+              <div class="next_step tt-button ui-state-default ui-priority-secondary ui-corner-all">
+                <a href="{$login_url}">Log In &raquo;</a>
+              </div>
             </div>
           </div>
-        </form>
+        
       </div>
     </div>
   </div>

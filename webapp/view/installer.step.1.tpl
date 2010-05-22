@@ -2,6 +2,7 @@
   <div id="installer-page" class="container_24 round-all">
     <div class="clearfix prepend_20 append_20">
       <div class="grid_22 push_1 clearfix">
+         <h2 class="clearfix stepTitle">Requirements Check</h2>
         <div class="clearfix append_20">
           <div class="grid_6 prefix_5 right"><span class="label">PHP Version >= 5.2</span></div>
           <div class="grid_8 prefix_1 left">

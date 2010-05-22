@@ -300,7 +300,7 @@ class Installer {
   }
   
 /**
- * Step 3 - Configure Site
+ * Step 3 - Finish
  * @access private
  * @return void
  */  
@@ -318,18 +318,11 @@ class Installer {
       $e->showError();
     }
     
-    self::$__view->assign('subtitle', 'Configure Site');
-  }
-
-/**
- * Step 4 - Finish
- * @access private
- * @return void
- */  
-  private function __step4() {
-    self::$__view->assign('username', 'Dwi Widiastuti');
+    $site_email = trim($_POST['site_email']);
+    
+    self::$__view->assign('username', $site_email);
     self::$__view->assign('password', self::__generatePassword());
-    self::$__view->assign('login_url', THINKTANK_WEBAPP_PATH . 'session/login.php');
+    self::$__view->assign('login_url', THINKTANK_BASE_URL . 'session/login.php');
     self::$__view->assign('subtitle', 'Finish');
   }
   
