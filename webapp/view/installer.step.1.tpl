@@ -14,7 +14,9 @@
         </div>
         {/if}
         <div class="clearfix append_20">
-          <div class="grid_6 prefix_5 right"><span class="label">PHP Version >= 5.2</span></div>
+          <div class="grid_6 prefix_5 right">
+            <span class="label{if !$php_compat} no{/if}">PHP Version >= 5.2</span>
+          </div>
           <div class="grid_8 prefix_1 left">
             {if $php_compat}
             <span class="value yes">Yes</span>
@@ -23,9 +25,16 @@
             {/if}
           </div>
         </div>
+        {if !$php_compat}
+        <div class="clearfix append_20 info_message">
+          <p>ThinkTank needs PHP version greater or equal to v.{$php_required_version}</p>
+        </div>
+        {/if}
         
         <div class="clearfix append_20">
-          <div class="grid_6 prefix_5 right"><span class="label">cURL enabled</span></div>
+          <div class="grid_6 prefix_5 right">
+            <span class="label{if !$libs.curl} no{/if}">cURL installed</span>
+          </div>
           <div class="grid_8 prefix_1 left">
             {if $libs.curl}
             <span class="value yes">Yes</span>
@@ -34,9 +43,16 @@
             {/if}
           </div>
         </div>
+        {if !$libs.curl}
+        <div class="clearfix append_20 info_message">
+          <p>ThinkTank needs cURL installed on your system.</p>
+        </div>
+        {/if}
         
         <div class="clearfix append_20">
-          <div class="grid_6 prefix_5 right"><span class="label">GD lib installed</span></div>
+          <div class="grid_6 prefix_5 right">
+            <span class="label {if !$libs.gd} no{/if}">GD lib installed</span>
+          </div>
           <div class="grid_8 prefix_1 left">
             {if $libs.gd}
             <span class="value yes">Yes</span>
@@ -45,6 +61,11 @@
             {/if}
           </div>
         </div>
+        {if !$libs.gd}
+        <div class="clearfix append_20 info_message">
+          <p>ThinkTank needs GD lib installed on your system.</p>
+        </div>
+        {/if}
         
         <div class="clearfix append_20">
           <div class="grid_6 prefix_5 right">

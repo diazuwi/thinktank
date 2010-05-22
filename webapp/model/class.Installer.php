@@ -272,6 +272,7 @@ class Installer {
       $php_compat = 1;
     }
     self::$__view->assign('php_compat', $php_compat);
+    self::$__view->assign('php_required_version', self::$__requiredVersion['php']);
     self::$__view->assign('libs', self::checkDependency());
     self::$__view->assign('permission', self::checkPermission());
     $writeable_directories = array(
