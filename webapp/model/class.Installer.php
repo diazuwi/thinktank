@@ -204,20 +204,35 @@ class Installer {
     
     return $ret;
   }
-  
-  function checkAll() {
+
+/**
+ * Check all requirements
+ * @access public
+ * @return bool
+ */  
+  function checkStep1() {
     $version_compat = $this->checkVersion();
-    $lib_depends = $this->checkDependency();
-    $writeable_permission = $this->checkPermission();
     
-    return ($version_compat && $lib_depends && $writeable_permission);
+    $lib_depends = $this->checkDependency();
+    $lib_depends_ret = true;
+    foreach ($lib_depends as $lib) {
+      $lib_depends_ret = $lib_depends_ret && $lib;
+    }
+    
+    $writeable_permission = $this->checkPermission();
+    $writeable_permission_ret = true;
+    foreach ($writeable_permission as $permission) {
+      $writeable_permission_ret = $writeable_permission_ret && $permission;
+    }
+    
+    return ($version_compat && $lib_depends_ret && $writeable_permission_ret);
   }
 
 /**
  * Check database
  * @param array $params database credentials
  * @access private
- * @return void
+ * @return mixed
  */
   private function __checkDb($params) {
     $c = @mysql_connect($params['host'], $params['user'], $params['passwd'], true);
@@ -240,13 +255,15 @@ class Installer {
         self::ERROR_DB_SELECT
       );
     }
+    
+    return true;
   }
 
 /**
  * Validate Site Name
  * @param string $sitename Site name to check
  * @access private
- * @return bool
+ * @return mixed
  */
   private function __checkSiteName($sitename = '') {
     if ( empty($sitename) ) {
@@ -255,20 +272,24 @@ class Installer {
         self::ERROR_SITE_NAME
       );
     }
+    
+    return true;
   }
 
 /**
  * Validate email
  * @param string $email Email to be validated
- * @return mixed string of $email when valid and false when $email is not valid
+ * @return mixed
  */  
-  private function __checkValidEmail($email) {
+  private function __checkValidEmail($email = '') {
     if ( !eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $email) ) {
       throw new InstallerError(
         "<p>Please provide valid email.</p>",
         self::ERROR_SITE_EMAIL
       );
     }
+    
+    return true;
   }
 
 /**
@@ -337,6 +358,13 @@ class Installer {
  * @return void
  */  
   private function __step2() {
+    // make sure we have passed step 1
+    if ( !self::checkStep1() ) {
+      self::__step1();
+      self::$__view->display('installer.step.1.tpl');
+      die;
+    }
+    
     self::$__view->assign('db_name', 'thinktank');
     self::$__view->assign('db_user', 'username');
     self::$__view->assign('db_passwd', 'password');
