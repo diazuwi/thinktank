@@ -1,4 +1,54 @@
 <?php
+class InstallerError extends Exception {
+}
+
+class Loader {
+  static public function register() {
+    return spl_autoload_register(array(
+      __CLASS__, 'load'
+    ));
+  }
+  
+  static public function load($class) {
+    if ( class_exists($class, FALSE) ) {
+      return;
+    }
+    
+    $lookupPath = array(
+      THINKTANK_WEBAPP_PATH . 'model' . DS, 
+      THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
+      'libs' . DS, THINKTANK_WEBAPP_PATH . 'install' . DS
+    );
+    // Smarty has different filename
+    if ( $class == 'Smarty' ) {
+      $file = 'Smarty.class.php';
+    } else {
+      $file = 'class.' . $class . '.php';
+    }
+    $file_found = false;
+    
+    foreach ( $lookupPath as $path ) {
+      if ( file_exists($path . $file) ) {
+        $file_found = true;
+        $filename = $path . $file;
+        break;
+      }
+    }
+    
+    if ( !$file_found ) {
+      throw new InstallerError('Error: File ' . $file . ' not found.');
+    }
+    
+    require $filename;
+    
+    if ( !class_exists($class, FALSE) ) {
+      throw new InstallerError('Error: Class ' . $class . ' not found.');
+    }
+    
+    return true;
+  }
+}
+
 class Installer {
 /**
  * Singleton instance of Installer
@@ -46,12 +96,10 @@ class Installer {
     if ( self::$__instance == null ) {
       self::$__instance = new Installer();
       
-      spl_autoload_register( array('Loader', 'load') );
+      // use lazy loading
+      Loader::register();
       
-      // instantiate SmartyInstaller 
-      require_once (THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
-        'libs' . DS . 'Smarty.class.php');
-      require_once 'class.SmartyInstaller.php';
+      // instantiate SmartyInstaller
       self::$__view = new SmartyInstaller();
       self::$__view->assign('base_url', THINKTANK_BASE_URL);
       self::$__view->assign('favicon', THINKTANK_BASE_URL . 'assets/img/favicon.ico');
@@ -59,6 +107,7 @@ class Installer {
       // get required version of php and mysql
       // and set current version
       require_once (THINKTANK_WEBAPP_PATH . 'install' . DS . 'version.php');
+      
       self::$__requiredVersion = array(
         'php' => $THINKTANK_VERSION_REQUIRED['php'],
         'mysql' => $THINKTANK_VERSION_REQUIRED['mysql']
@@ -270,41 +319,6 @@ class Installer {
     self::$__view->assign('subtitle', $title);
     self::$__view->display('installer.die.tpl');
     die();
-  }
-}
-
-class InstallerError extends Exception {
-}
-
-class Loader {
-  public static function load($class) {
-    if ( class_exists($class, FALSE) ) {
-      return;
-    }
-    
-    $lookupPath = array(
-      '', THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
-      'libs' . DS, THINKTANK_WEBAPP_PATH . 'install' . DS
-    );
-    $file = 'class.' . $class . '.php';
-    $file_found = false;
-    
-    foreach ( $lookupPath as $path ) {
-      if ( file_exists($path . $file) ) {
-        $file_found = true;
-        break;
-      }
-    }
-    
-    if ( !$file_found ) {
-      throw new InstallerError('Error: File ' . $file . ' not found.');
-    }
-    
-    require $file;
-    
-    if ( !class_exists($class, FALSE) ) {
-      throw new InstallerError('Error: Class ' . $class . ' not found.');
-    }
   }
 }
 ?>
