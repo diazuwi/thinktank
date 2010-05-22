@@ -8,6 +8,7 @@
             also already sent to {$username}
           </div>
         
+          {if $username}
           <div class="clearfix append_20">
             <div class="grid_6 prefix_5 right">
               <span class="label">Username</span>
@@ -17,6 +18,7 @@
             </div>
           </div>
           
+          
           <div class="clearfix append_20">
             <div class="grid_6 prefix_5 right">
               <span class="label">Password</span>
@@ -25,6 +27,7 @@
               <span class="value">{$password}</span>
             </div>
           </div>
+          {/if}
           
           <div class="clearfix append_20">
             <div class="grid_10 prefix_8 left">
