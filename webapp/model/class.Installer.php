@@ -4,11 +4,18 @@ class InstallerError extends Exception {
     $title = '';
     switch ( $this->getCode() ) {
       case Installer::ERROR_FILE_NOT_FOUND:
+        $title = 'File Not Found';
+        break;
       case Installer::ERROR_CLASS_NOT_FOUND:
+        $title = 'Class Not Found';
+        break;
       case Installer::ERROR_DB_CONNECT:
         $title = 'Database Error';
       case Installer::ERROR_DB_SELECT:
         $title = 'Database Error';
+        break;
+      case Installer::ERROR_DB_TABLES_EXIST:
+        $title = 'ThinkTank Tables Exist';
         break;
       case Installer::ERROR_SITE_NAME:
         $title = 'Invalid Site Name';
@@ -41,6 +48,7 @@ class Loader {
       THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
       'libs' . DS, THINKTANK_WEBAPP_PATH . 'install' . DS
     );
+    
     // Smarty has different filename
     if ( $class == 'Smarty' ) {
       $file = 'Smarty.class.php';
@@ -58,13 +66,25 @@ class Loader {
     }
     
     if ( !$file_found ) {
-      throw new InstallerError('Error: File ' . $file . ' not found.');
+      try {
+        throw new InstallerError(
+          'File ' . $file . ' not found.', Installer::ERROR_FILE_NOT_FOUND
+        );
+      } catch (InstallerError $e) {
+        $e->showError();
+      }
     }
     
     require $filename;
     
     if ( !class_exists($class, FALSE) ) {
-      throw new InstallerError('Error: Class ' . $class . ' not found.');
+      try {
+        throw new InstallerError(
+          'Class ' . $class . ' not found.', Installer::ERROR_CLASS_NOT_FOUND
+        );
+      } catch (InstallerError $e) {
+        $e->showError();
+      }
     }
     
     return true;
@@ -93,9 +113,13 @@ class Installer {
   const ERROR_CLASS_NOT_FOUND = 2;
   const ERROR_DB_CONNECT = 3;
   const ERROR_DB_SELECT = 4;
-  const ERROR_SITE_NAME = 5;
-  const ERROR_SITE_EMAIL = 6;
-  const ERROR_CONFIG_SAMPLE_MISSING = 7;
+  const ERROR_DB_TABLES_EXIST = 5;
+  const ERROR_SITE_NAME = 6;
+  const ERROR_SITE_EMAIL = 7;
+  const ERROR_CONFIG_SAMPLE_MISSING = 8;
+  const ERROR_CONFIG_SOURCE_ROOT_PATH = 9;
+  const ERROR_CONFIG_SMARTY_PATH = 10;
+  const ERROR_CONFIG_LOG_LOCATION = 11;
   
 /**
  * Stores current version of ThinkTank
@@ -111,6 +135,17 @@ class Installer {
  *  Smarty Instance
  */
   private static $__view;
+
+/**
+ * List of ThinkTank tables
+ *
+ * @var array
+ */  
+  public $tables = array(
+    'follows', 'instances', 'links', 'owners', 'owner_instances',
+    'plugins', 'plugin_options', 'posts', 'post_errors', 'users',
+    'user_errors'
+  );
   
 /**
  * Private constructor, so can't be accessed
@@ -206,7 +241,36 @@ class Installer {
   }
 
 /**
- * Check all requirements
+ * Check path existent
+ * @param array $config
+ */
+  function checkPath($config) {
+    // check if $THINKTANK_CFG related to path exists
+    if ( !is_dir($config['source_root_path']) ) {
+      throw new InstallerError(
+        "<p>ThinkTank's source root directory is not found</p>",
+        self::ERROR_CONFIG_SOURCE_ROOT_PATH
+      );
+    }
+    if ( !is_dir($config['smarty_path']) ) {
+      throw new InstallerError(
+        "<p>ThinkTank's smarty directory is not found</p>",
+        self::ERROR_CONFIG_SMARTY_PATH
+      );
+    }
+    if ( !is_dir(substr($config['log_location'], 0, -11)) ) {
+      throw new InstallerError(
+        "<p>ThinkTank log directory is not found</p>",
+        self::ERROR_CONFIG_LOG_LOCATION
+      );
+    }
+    
+    return true;
+  }
+
+/**
+ * Check all requirements on step 1
+ * Check PHP version, cURL, 
  * @access public
  * @return bool
  */  
@@ -231,29 +295,62 @@ class Installer {
 /**
  * Check database
  * @param array $params database credentials
- * @access private
  * @return mixed
  */
-  private function __checkDb($params) {
-    $c = @mysql_connect($params['host'], $params['user'], $params['passwd'], true);
+  function checkDb($params) {
+    $c = @mysql_connect($params['db_host'], $params['db_user'], $params['db_password'], true);
     if (!$c) {
       throw new InstallerError(
         '<p>Failed establishing database connection. Probably either your username, ' .
-        '<code>' . $params['user'] . '</code>, and password, <code>' . $params['passwd'] .
+        '<code>' . $params['db_user'] . '</code>, and password, <code>' . $params['db_password'] .
         '</code>, you have provided are incorrect or we can\'t connect the' .
-        'database server at <code>' . $params['host'] . '</code>' .
+        'database server at <code>' . $params['db_host'] . '</code>' .
         '</p>' ,
         self::ERROR_DB_CONNECT
       );
     }
     
-    if (!@mysql_select_db($params['name'], $c)) {
+    if (!@mysql_select_db($params['db_name'], $c)) {
       throw new InstallerError(
         "<p>We were able to connect to the database server (which means " .
         "your username and password is okay) but not able to select the <code>" . 
-        $params['name'] . "</code> database.</p> ", 
+        $params['db_name'] . "</code> database.</p> ", 
         self::ERROR_DB_SELECT
       );
+    }
+    
+    return true;
+  }
+
+/**
+ * Check table existent
+ * @param array $config
+ */  
+  function checkTable($config) {
+    $db = new Database($config);
+    $c  = $db->getConnection();
+    
+    if (!$c) {
+      throw new InstallerError(
+        '<p>Failed establishing database connection. Probably either your username, ' .
+        '<code>' . $config['db_user'] . '</code>, and password, <code>' . $config['db_password'] .
+        '</code>, you have provided are incorrect or we can\'t connect the' .
+        'database server at <code>' . $config['db_host'] . '</code>' .
+        '</p>' ,
+        self::ERROR_DB_CONNECT
+      );
+    }
+    
+    $tables = $db->exec('SHOW TABLES');
+    
+    foreach ( self::tables as $table ) {
+      if ( in_array($config['table_prefix'] . $table, $tables) ) {
+        // TODO: when table already exists, ask for repairing
+        throw new InstallerError(
+          "<p>ThinkTank tables exist</p>",
+          self::ERROR_DB_TABLES_EXIST
+        );
+      }
     }
     
     return true;
@@ -387,26 +484,30 @@ class Installer {
     if ( file_exists($config_file) && !$_POST ) {
       $config_file_exists = true;
       require $config_file;
-      $db['name']   = $THINKTANK_CFG['db_name'];
-      $db['user']   = $THINKTANK_CFG['db_user'];
-      $db['passwd'] = $THINKTANK_CFG['db_password'];
-      $db['host']   = $THINKTANK_CFG['db_host'];
-      $db['prefix'] = $THINKTANK_CFG['table_prefix'];
+      $db_config['db_name']   = $THINKTANK_CFG['db_name'];
+      $db_config['db_user']   = $THINKTANK_CFG['db_user'];
+      $db_config['db_password'] = $THINKTANK_CFG['db_password'];
+      $db_config['db_host']   = $THINKTANK_CFG['db_host'];
+      $db_config['table_prefix'] = $THINKTANK_CFG['table_prefix'];
       $site_name    = $THINKTANK_CFG['app_title'];
       $site_email   = trim($_GET['site_email']);
     } else {
       // trim each posted value
-      $db['name']   = trim($_POST['db_name']);
-      $db['user']   = trim($_POST['db_user']);
-      $db['passwd'] = trim($_POST['db_passwd']);
-      $db['host']   = trim($_POST['db_host']);
-      $db['prefix'] = trim($_POST['db_prefix']);
+      $db_config['db_name']   = trim($_POST['db_name']);
+      $db_config['db_user']   = trim($_POST['db_user']);
+      $db_config['db_password'] = trim($_POST['db_passwd']);
+      $db_config['db_host']   = trim($_POST['db_host']);
+      $db_config['table_prefix'] = trim($_POST['db_prefix']);
       $site_email   = trim($_POST['site_email']);
       $site_name    = trim($_POST['site_name']);
+      
+      if ( empty($db_config['table_prefix']) ) {
+        $db_config['table_prefix'] = 'tt_';
+      }
     }
     
     try {
-      self::__checkDb($db);
+      self::checkDb($db_config);
     } catch (InstallerError $e) {
       $e->showError();
     }
@@ -465,27 +566,27 @@ class Installer {
             break;
           case "['db_host']                   ":
             $sample_config[$line_num] = str_replace(
-              "'localhost'", "'" . $db['host'] . "'", $line
+              "'localhost'", "'" . $db_config['db_host'] . "'", $line
             );
             break;
           case "['db_user']                   ":
             $sample_config[$line_num] = str_replace(
-              "'your_database_username'", "'" . $db['user'] . "'", $line
+              "'your_database_username'", "'" . $db_config['db_user'] . "'", $line
             );
             break;
           case "['db_password']               ":
             $sample_config[$line_num] = str_replace(
-              "'your_database_password'", "'" . $db['passwd'] . "'", $line
+              "'your_database_password'", "'" . $db_config['db_password'] . "'", $line
             );
             break;
           case "['db_name']                   ":
             $sample_config[$line_num] = str_replace(
-              "'your_thinktank_database_name'", "'" . $db['name'] . "'", $line
+              "'your_thinktank_database_name'", "'" . $db_config['db_name'] . "'", $line
             );
             break;
           case "['table_prefix']              ":
             $sample_config[$line_num] = str_replace(
-              "'tt_'", "'" . $db['prefix'] . "'", $line
+              "'tt_'", "'" . $db_config['table_prefix'] . "'", $line
             );
             break;
         }
@@ -519,6 +620,13 @@ class Installer {
       }
       
     } // if !$config_file_exists
+    
+    // check tables
+    try {
+      self::checkTable($db_config);
+    } catch (InstallerError $e) {
+      $e->showError();
+    }
     
     self::$__view->assign('username', $site_email);
     self::$__view->assign('password', self::__generatePassword());
@@ -558,6 +666,13 @@ class Installer {
  * @param string $title Title on browser
  */
   function diePage($message, $title = '') {
+    // chec if compile_dir is set
+    if ( !isset(self::$__view->compile_dir) ) {
+      echo '<strong>ERROR: Couldn\'t instantiate SmartyInstaller or Smarty!</strong><br>';
+      echo '<p>Make sure Smarty related classes exist.<br>';
+      die();
+    }
+    
     // check if compiled directory is writeable
     if ( !is_writable(self::$__view->compile_dir) ) {
       echo '<strong>ERROR: ' . self::$__view->compile_dir . ' is not writeable!</strong><br>';
