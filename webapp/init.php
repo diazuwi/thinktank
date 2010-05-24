@@ -22,7 +22,17 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   $installer->diePage($message, 'Error');
 } else {
   // config file exists in THINKTANK_WEBAPP_PATH
-  // first check table existent
+  require_once 'config.inc.php';
+  
+  try {
+    // check if $THINKTANK_CFG related to path exists
+    $installer->checkPath($THINKTANK_CFG);
+    
+    // check tables
+    $installer->checkTable($THINKTANK_CFG);
+  } catch (InstallerError $e) {
+    $e->showError();
+  }
 }
 
 require_once 'model/class.Config.php';
@@ -53,22 +63,6 @@ require_once 'model/class.Webapp.php';
 
 require_once 'config.inc.php';
 
-// check if $THINKTANK_CFG related to path exists
-// TODO: since we have defined THINKTANK_ROOT_PATH above, we could use that
-//       on config.inc.php
-if ( !is_dir($THINKTANK_CFG['source_root_path']) ) {
-  echo "ERROR: ThinkTank's source root directory is not found";
-  die();
-}
-if ( !is_dir($THINKTANK_CFG['smarty_path']) ) {
-  echo "ERROR: ThinkTank's smarty directory is not found";
-  die();
-}
-if ( !is_dir(substr($THINKTANK_CFG['log_location'], 0, -11)) ) {
-  echo "ERROR: ThinkTank log directory is not found";
-  die();
-}
-// end check $THINKTANK_CFG related to path exists
 
 require_once ($THINKTANK_CFG['smarty_path'].'Smarty.class.php');
 require_once 'model/class.SmartyThinkTank.php';
