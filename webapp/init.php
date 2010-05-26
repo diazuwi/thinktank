@@ -28,8 +28,10 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
     // check if $THINKTANK_CFG related to path exists
     $installer->checkPath($THINKTANK_CFG);
     
-    // check tables
-    $installer->checkTable($THINKTANK_CFG);
+    // check if ThinkTank is installed
+    if ( !$installer->isThinkTankInstalled($THINKTANK_CFG) ) {
+      throw new InstallerError('', Installer::ERROR_INSTALL_NOT_COMPLETE);
+    }
   } catch (InstallerError $e) {
     $e->showError();
   }
