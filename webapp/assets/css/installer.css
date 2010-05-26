@@ -11,6 +11,20 @@ code {
   background-color: #FFF;
   margin-top: 20px;
 }
+.install_step {
+  border-right:1px solid #CCCCCC;
+  margin:10px 0;
+  padding:0;
+}
+.ui-state-default .install_step {color: #C0C0C0;}
+.ui-state-active .install_step {color: #333;}
+.no-border .install_step {border: none;}
+#thinktank-tabs #step-tab-1 {width:285px;}
+#thinktank-tabs #step-tab-1 .install_step {width:285px;}
+#thinktank-tabs #step-tab-2 {width:430px;}
+#thinktank-tabs #step-tab-2 .install_step {width:430px;}
+#thinktank-tabs #step-tab-3 {width:220px;}
+#thinktank-tabs #step-tab-3 .install_step {width:220px;}
 .next_step {
   width: 250px;
   margin-top: 20px;
