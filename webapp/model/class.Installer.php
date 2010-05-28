@@ -1065,13 +1065,6 @@ class Installer {
     global $THINKTANK_CFG;
     $THINKTANK_CFG = $db_config;
     $admin_exists = self::isAdminExists();
-    if ( $config_file_exists && !$admin_exists ) {
-      self::$__errorMessages[] = 'It seems ThinkTable table and configuration file present, ' .
-                                 "but you don't have admin user.";
-      throw new InstallerError(
-        '', self::ERROR_INSTALL_NOT_COMPLETE
-      );
-    }
     
     if ( !$admin_exists ) { // create admin if not exists
       $password = self::__generatePassword();

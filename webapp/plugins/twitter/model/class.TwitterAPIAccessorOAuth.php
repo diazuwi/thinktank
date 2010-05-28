@@ -37,7 +37,7 @@ class TwitterAPIAccessorOAuth {
     function prepAPI() {
     
         # Define how to access Twitter API
-        $api_domain = 'https://twitter.com';
+        $api_domain = 'https://api.twitter.com/1';
         $api_format = 'xml';
         $search_domain = 'http://search.twitter.com';
         $search_format = 'json';
@@ -215,11 +215,12 @@ class CrawlerTwitterAPIAccessorOAuth extends TwitterAPIAccessorOAuth {
         $this->archive_limit = $archive_limit;
     }
     
-    function init($logger) {
+    function init() {
+    	$logger = Logger::getInstance();
         $status_message = "";
         
         $account_status = $this->cURL_source['rate_limit'];
-        list($cURL_status, $twitter_data) = $this->apiRequest($account_status, $logger);
+        list($cURL_status, $twitter_data) = $this->apiRequest($account_status);
         $this->available_api_calls_for_crawler++; //status check doesnt' count against balance
         
         if ($cURL_status > 200) {
@@ -263,7 +264,8 @@ class CrawlerTwitterAPIAccessorOAuth extends TwitterAPIAccessorOAuth {
         
     }
     
-    function apiRequest($url, $logger, $args = array(), $auth = true) {
+    function apiRequest($url, $args = array(), $auth = true) {
+        $logger = Logger::getInstance();
         if ($auth) {
             $content = $this->to->OAuthRequest($url, 'GET', $args);
             $status = $this->to->lastStatusCode();
