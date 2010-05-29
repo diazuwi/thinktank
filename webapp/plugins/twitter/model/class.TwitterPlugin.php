@@ -1,4 +1,12 @@
 <?php
+/**
+ * Twitter Plugin
+ *
+ * the Twitter crawler and webapp plugin which retrieves data from Twitter and displays it
+ *
+ * @author Gina Trapani <ginatrapani[at]gmail[dot]com>
+ *
+ */
 class TwitterPlugin implements CrawlerPlugin, WebappPlugin {
     public function crawl() {
         global $db;
@@ -6,8 +14,8 @@ class TwitterPlugin implements CrawlerPlugin, WebappPlugin {
 
         $config = Config::getInstance();
         $logger = Logger::getInstance();
-		$id = DAOFactory::getDAO('InstanceDAO');
-		$oid = new OwnerInstanceDAO($db, $logger);
+        $id = DAOFactory::getDAO('InstanceDAO');
+        $oid = new OwnerInstanceDAO($db, $logger);
 
         $instances = $id->getAllActiveInstancesStalestFirstByNetwork('twitter');
         foreach ($instances as $i) {
@@ -40,9 +48,6 @@ class TwitterPlugin implements CrawlerPlugin, WebappPlugin {
                 $crawler->fetchInstanceUserTweets();
 
                 if (!$noauth) {
-                    // Auth req'd, for calling user only
-                    $crawler->fetchInstanceUserRetweetsByMe();
-
                     // Auth req'd, for calling user only
                     $crawler->fetchInstanceUserMentions();
 
