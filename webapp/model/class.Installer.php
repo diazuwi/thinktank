@@ -1018,6 +1018,11 @@ class Installer {
               "'your_thinktank_database_name'", "'" . $db_config['db_name'] . "'", $line
             );
             break;
+          case "['db_socket']                   ": // TODO: remove this when PDODAO consistent with host and port
+            $sample_config[$line_num] = str_replace(
+              "'/tmp/mysql.sock'", "''", $line
+            );
+            break;
           case "['table_prefix']              ":
             $sample_config[$line_num] = str_replace(
               "'tt_'", "'" . $db_config['table_prefix'] . "'", $line
@@ -1084,6 +1089,9 @@ class Installer {
       $q .= " (`user_email`,`user_pwd`,`country`,`joined`,`activation_code`,`full_name`, `user_activated`, `is_admin`)";
       $q .= " VALUES ('".$site_email."','".md5($password)."','".$country."',now(),'','".$owner_name."', 1, 1)";
       self::$db->exec($q);
+    } else {
+      $site_email = 'Use your old email';
+      $password = 'Use your old password';
     }
     unset($THINKTANK_CFG);
     
