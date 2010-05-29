@@ -909,7 +909,9 @@ class Installer {
     $config_file_exists = false;
     $config_file = THINKTANK_WEBAPP_PATH . 'config.inc.php';
     // check if we have made config.inc.php
-    if ( file_exists($config_file) && !$_POST ) {
+    if ( file_exists($config_file) ) {
+      // this is could be from step 2 is not able writing
+      // to webapp dir
       $config_file_exists = true;
       require $config_file;
       $db_config['db_name']   = $THINKTANK_CFG['db_name'];
@@ -917,8 +919,10 @@ class Installer {
       $db_config['db_password'] = $THINKTANK_CFG['db_password'];
       $db_config['db_host']   = $THINKTANK_CFG['db_host'];
       $db_config['table_prefix'] = $THINKTANK_CFG['table_prefix'];
+      $site_email   = trim($_POST['site_email']);
+      $owner_name   = trim($_POST['owner_name']);
       $site_name    = $THINKTANK_CFG['app_title'];
-      $site_email   = trim($_GET['site_email']);
+      $country      = trim($_POST['country']);
     } else {
       // trim each posted value
       $db_config['db_name']   = trim($_POST['db_name']);
@@ -1033,10 +1037,18 @@ class Installer {
         }
         $message .= '</textarea><br>';
         $message .= "<p>After you've done that, click the Next Step &raquo;</p>";
-        $message .= '<div class="clearfix"><div class="grid_10 prefix_8 left">';
-        $message .= '<div class="next_step tt-button ui-state-default ui-priority-secondary ui-corner-all">';
-        $message .= '<a href="index.php?step=3&amp;site_email=' . $site_email . '">Next Step &raquo;</a>';
-        $message .= '</div></div></div>';
+        
+        // hidden form
+        $message .= '<form name="form1" method="post" action="index.php?step=3">';
+        $message .= '<input type="hidden" name="owner_name" value="'.$owner_name.'">';
+        $message .= '<input type="hidden" name="site_email" value="'.$site_email.'">';
+        $message .= '<input type="hidden" name="country" value="'.$country.'">';
+        
+        // submit button
+        $message .= '<div class="clearfix append_20">' .
+                    '<div class="grid_10 prefix_9 left">' .
+                    '<input type="submit" name="Submit" class="tt-button ui-state-default ui-priority-secondary ui-corner-all" value="Next Step &raquo">' .
+                    '</div></div></form>';
         
         self::diePage($message, 'File Configuration Error');
       } else {
