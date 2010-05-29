@@ -49,6 +49,11 @@ class InstallerError extends Exception {
         $title = 'Installation is Not Complete';
         $this->message = $message;
         break;
+      case Installer::ERROR_INSTALL_COMPLETE:
+        $message = 'It seems ThinkTank already installed.';
+        $title = 'ThinkTank already installed';
+        $this->message = $message;
+        break;
     }
     
     Installer::diePage($this->getMessage(), $title);
@@ -148,6 +153,7 @@ class Installer {
   const ERROR_TYPE_MISMATCH = 12;
   const ERROR_INSTALL_PATH_EXISTS = 13;
   const ERROR_INSTALL_NOT_COMPLETE = 14;
+  const ERROR_INSTALL_COMPLETE = 15;
   
 /**
  * Stores current version of ThinkTank

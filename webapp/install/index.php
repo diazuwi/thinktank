@@ -9,6 +9,26 @@ define('THINKTANK_BASE_URL', substr($_SERVER['PHP_SELF'], 0, strpos( $_SERVER['P
 
 require_once '../model/class.Installer.php';
 $installer = Installer::getInstance();
+
+if ( file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
+  // config file exists in THINKTANK_WEBAPP_PATH
+  require_once THINKTANK_WEBAPP_PATH . 'config.inc.php';
+  
+  try {
+    // check if $THINKTANK_CFG related to path exists
+    if ( $installer->checkPath($THINKTANK_CFG) ) {
+      throw new InstallerError('', Installer::ERROR_INSTALL_COMPLETE);
+    }
+    
+    // check if ThinkTank is installed
+    if ( $installer->isThinkTankInstalled($THINKTANK_CFG) ) {
+      throw new InstallerError('', Installer::ERROR_INSTALL_COMPLETE);
+    }
+  } catch (InstallerError $e) {
+    $e->showError();
+  }
+}
+
 $step = (int) $_GET['step'];
 $installer->installPage($step);
 ?>
