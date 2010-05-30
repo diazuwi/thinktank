@@ -7,6 +7,16 @@
             Please login with account provided below. This account information
             also already sent to {$username}
           </div>
+          {if !empty($errors)}
+          <div class="clearfix error_message">
+            <strong>Ups!</strong> there are something you need to do:
+            <ul>
+            {foreach from=$errors item=error}
+              <li>{$error}</li>
+            {/foreach}
+            </ul>
+          </div>
+          {/if}
         
           {if $username}
           <div class="clearfix append_20">

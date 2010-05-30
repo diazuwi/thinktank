@@ -28,8 +28,10 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
     // check if $THINKTANK_CFG related to path exists
     $installer->checkPath($THINKTANK_CFG);
     
-    // check tables
-    $installer->checkTable($THINKTANK_CFG);
+    // check if ThinkTank is installed
+    if ( !$installer->isThinkTankInstalled($THINKTANK_CFG) ) {
+      throw new InstallerError('', Installer::ERROR_INSTALL_NOT_COMPLETE);
+    }
   } catch (InstallerError $e) {
     $e->showError();
   }
@@ -38,6 +40,8 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
 require_once 'model/class.Config.php';
 require_once 'model/class.Database.php';
 require_once 'model/class.MySQLDAO.php';
+require_once 'model/class.PDODAO.php';
+require_once 'model/class.DAOFactory.php';
 require_once 'model/class.User.php';
 require_once 'model/class.Owner.php';
 require_once 'model/class.Post.php';
@@ -51,7 +55,11 @@ require_once 'model/class.Captcha.php';
 require_once 'model/class.Session.php';
 require_once 'model/class.Plugin.php';
 require_once 'model/class.LoggerSlowSQL.php';
-require_once 'model/interface.iPlugin.php';
+require_once 'model/interface.ThinkTankPlugin.php';
+require_once 'model/interface.CrawlerPlugin.php';
+require_once 'model/interface.WebappPlugin.php';
+require_once 'model/class.WebappTab.php';
+require_once 'model/class.WebappTabDataset.php';
 
 # crawler only
 require_once 'model/class.Logger.php';
@@ -63,10 +71,19 @@ require_once 'model/class.Webapp.php';
 
 require_once 'config.inc.php';
 
+$config = Config::getInstance();
+require_once $config->getValue('smarty_path').'Smarty.class.php';
 
-require_once ($THINKTANK_CFG['smarty_path'].'Smarty.class.php');
 require_once 'model/class.SmartyThinkTank.php';
-require_once $THINKTANK_CFG['source_root_path'].'extlib/twitteroauth/twitteroauth.php';
+require_once $config->getValue('source_root_path').'extlib/twitteroauth/twitteroauth.php';
+
+if ($config->getValue('time_zone')) {
+    putenv($config->getValue('time_zone'));
+}
+if ($config->getValue('debug')) {
+    ini_set("display_errors", 1);
+    ini_set("error_reporting", E_ALL);
+}
 
 $webapp = new Webapp();
 $crawler = new Crawler();
@@ -75,7 +92,8 @@ $crawler = new Crawler();
 try {
     $db = new Database($THINKTANK_CFG);
     $conn = $db->getConnection();
-} catch(Exception $e) {
+}
+catch(Exception $e) {
     echo $e->getMessage();
 }
 
@@ -83,11 +101,11 @@ try {
 $pdao = new PluginDAO($db);
 $active_plugins = $pdao->getActivePlugins();
 foreach ($active_plugins as $ap) {
-    foreach (glob($THINKTANK_CFG['source_root_path'].'webapp/plugins/'.$ap->folder_name."/model/*.php") as $includefile) {
-        require_once ($includefile);
+    foreach (glob($config->getValue('source_root_path').'webapp/plugins/'.$ap->folder_name."/model/*.php") as $includefile) {
+        require_once $includefile;
     }
-    foreach (glob($THINKTANK_CFG['source_root_path'].'webapp/plugins/'.$ap->folder_name."/controller/*.php") as $includefile) {
-        require_once ($includefile);
+    foreach (glob($config->getValue('source_root_path').'webapp/plugins/'.$ap->folder_name."/controller/*.php") as $includefile) {
+        require_once $includefile;
     }
 }
 ?>

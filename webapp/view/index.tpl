@@ -50,7 +50,7 @@
           <h1>{$owner_stats->post_count|number_format}</h1>
           <h3>Posts</h3>
         </div></a></li>
-        <li><a href="#mentions"><div class="key-stat">
+        <li><a href="#replies"><div class="key-stat">
           <h1>{$instance->total_replies_in_system|number_format}</h1>
           <h3>Replies</h3>
         </div></a></li>
@@ -68,7 +68,7 @@
         </div></a></li>
       </ul>
       <div class="section" id="updates">
-        <img src="{$cfg->site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart1">
+        <img src="{$site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart1">
         <div class="thinktank-canvas clearfix">
           <div class="container_24">
             <h4 class="trigger clearfix"><a href="#">Statistics</a></h4>
@@ -89,26 +89,25 @@
             </div> <!-- end .footnote -->
             <div class="clearfix append_20">
               <div class="grid_1 prefix_1">
-                <div id="loading_updates"><img src="{$cfg->site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
+                <div id="loading_updates"><img src="{$site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
               </div>
               <div class="grid_22 alpha append_20 clearfix">
                 <ul id="updates-menu" class="menu">
-                  <li class="menu-item selected" id="tweets-all">All</li>
-                  <li class="menu-item" id="tweets-mostreplies">Most replied-to</li>
-                  <li class="menu-item" id="tweets-mostretweeted">Most shared</li>
-                  <li class="menu-item" id="tweets-convo">Conversations</li>
+                  {foreach from=$post_tabs key=ptkey item=pt name=tabloop}
+                  	<li class="menu-item{if $smarty.foreach.tabloop.index == 0} selected{/if}" id="{$pt->short_name}">{$pt->name}</li>
+                  {/foreach}
                 </ul>
               </div>
             </div>
             <div class="grid_22 prefix_1">
-              <div id="tweets_content"></div>
+              <div id="posts_content"></div>
             </div>
           </div>
         </div> <!-- end .thinktank-canvas -->
       </div> <!-- end #updates -->
       
-      <div class="section" id="mentions">
-        <img src="{$cfg->site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart2">
+      <div class="section" id="replies">
+        <img src="{$site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart2">
         <div class="thinktank-canvas clearfix">
           <div class="container_24">
             <h4 class="trigger clearfix"><a href="#">Statistics</a></h4>
@@ -134,25 +133,24 @@
               </div>
             </div>
             <div class="grid_1 prefix_1">
-              <div id="loading_mentions"><img src="{$cfg->site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
+              <div id="loading_replies"><img src="{$site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
             </div>
             <div class="grid_22 alpha append_20 clearfix">
-              <ul id="mentions-menu" class="menu">
-                <li class="menu-item selected" id="mentions-all">All mentions</li>
-                <li class="menu-item" id="mentions-allreplies">Replies</li>
-                <li class="menu-item" id="mentions-orphan">Not replies or shared</li>
-                <li class="menu-item" id="mentions-standalone">Standalone</li>
+              <ul id="replies-menu" class="menu">
+                  {foreach from=$replies_tabs key=ptkey item=pt name=tabloop}
+                  	<li class="menu-item{if $smarty.foreach.tabloop.index == 0} selected{/if}" id="{$pt->short_name}">{$pt->name}</li>
+                  {/foreach}
               </ul>
             </div>
             <div class="grid_22 prefix_1">
-              <div id="mentions_content"></div>
+              <div id="replies_content"></div>
             </div>
           </div> <!-- end .container_24 -->
         </div> <!-- end .thinktank-canvas -->
-      </div> <!-- end #mentions -->
+      </div> <!-- end #replies -->
       
       <div class="section" id="followers">
-        <img src="{$cfg->site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart3">
+        <img src="{$site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart3">
         <div class="thinktank-canvas clearfix">
           <div class="container_24">
             <h4 class="trigger clearfix"><a href="#">Statistics</a></h4>
@@ -180,14 +178,13 @@
               </div>
             </div> <!-- end .grid_24 -->
             <div class="grid_1 prefix_1">
-              <div id="loading_followers"><img src="{$cfg->site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
+              <div id="loading_followers"><img src="{$site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
             </div>
             <div class="grid_22 alpha append_20 clearfix">
               <ul id="followers-menu" class="menu">
-                <li class="menu-item selected" id="followers-mostfollowed">Most-followed</li>
-                <li class="menu-item" id="followers-leastlikely">Least&nbsp;likely</li>
-                <li class="menu-item" id="followers-earliest">Earliest</li>
-                <li class="menu-item" id="followers-former">Former</li>
+                  {foreach from=$followers_tabs key=ptkey item=pt name=tabloop}
+                  	<li class="menu-item{if $smarty.foreach.tabloop.index == 0} selected{/if}" id="{$pt->short_name}">{$pt->name}</li>
+                  {/foreach}
               </ul>
             </div>
             <div class="grid_22 prefix_1">
@@ -198,7 +195,7 @@
       </div> <!-- end #followers -->
       
       <div class="section" id="friends">
-        <img src="{$cfg->site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart4">
+        <img src="{$site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart4">
         <div class="thinktank-canvas clearfix">
           <div class="container_24">
             <h4 class="trigger clearfix"><a href="#">Statistics</a></h4>
@@ -230,15 +227,14 @@
               </div>
             </div>
             <div class="grid_1 prefix_1">
-              <div id="loading_friends"><img src="{$cfg->site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
+              <div id="loading_friends"><img src="{$site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
             </div>
             <div class="grid_22 alpha append_20 clearfix">
               <ul id="friends-menu" class="menu">
-                <li class="menu-item selected" id="friends-mostactive">Chatterboxes</li>
-                <li class="menu-item" id="friends-leastactive">Deadbeats</li>
-                <li class="menu-item" id="friends-mostfollowed">Popular</li>
-                <li class="menu-item" id="friends-former">Former</li>
-                <li class="menu-item" id="friends-notmutual">Not&nbsp;mutual</li>
+                  {foreach from=$friends_tabs key=ptkey item=pt name=tabloop}
+                  	<li class="menu-item{if $smarty.foreach.tabloop.index == 0} selected{/if}" id="{$pt->short_name}">{$pt->name}</li>
+                  {/foreach}
+				
               </ul>
             </div>
             <div class="grid_22 prefix_1">
@@ -249,19 +245,19 @@
       </div> <!-- end #friends -->
       
       <div class="section" id="links">
-        <img src="{$cfg->site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart5">
+        <img src="{$site_root_path}assets/img/dart_wht.png" alt="" class="dart" id="dart5">
         <div class="thinktank-canvas clearfix">
           <div class="container_24">
             <!--<h4 class="trigger clearfix"><a href="#">Statistics</a></h4>-->
             <div class="grid_24 footnote toggle_container">&nbsp;</div>
             <div class="grid_1 prefix_1">
-              <div id="loading_links"><img src="{$cfg->site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
+              <div id="loading_links"><img src="{$site_root_path}assets/img/ui_throbber.gif" alt="Loading..."></div>
             </div>
             <div class="grid_22 alpha append_20 clearfix">
               <ul id="links-menu" class="menu">
-                <li class="menu-item selected" id="links-friends">From friends</li>
-                <li class="menu-item" id="links-favorites">From your favorites</li>
-                <li class="menu-item" id="links-photos">Photos</li>
+                  {foreach from=$links_tabs key=ptkey item=pt name=tabloop}
+                  	<li class="menu-item{if $smarty.foreach.tabloop.index == 0} selected{/if}" id="{$pt->short_name}">{$pt->name}</li>
+                  {/foreach}
               </ul>
             </div>
             <div class="grid_22 prefix_1">
@@ -340,7 +336,7 @@
             </li>
           {/if}
         {/foreach}
-        <li><a href="{$cfg->site_root_path}account/">Add an account &rarr;</a></li>
+        <li><a href="{$site_root_path}account/">Add an account &rarr;</a></li>
       </ul>
     {/if}
   </div> <!-- end #keystats -->

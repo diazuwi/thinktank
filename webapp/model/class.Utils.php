@@ -66,8 +66,22 @@ class Utils {
         return $plugins;
     }
 
+    static public function getPluginViewDirectory($shortname) {
+        $config = Config::getInstance();
+        $view_path = $config->getValue('source_root_path');
+        $view_path .= 'webapp/plugins/'.$shortname.'/view/';
+        return $view_path;
+    }
+
+    static public function getURLWithParams($url, $params){
+        $param_str = '';
+        foreach ($params as $key=>$value) {
+            $param_str .= $key .'=' . $value.'&';
+        }
+        if ($param_str != '') {
+            $url .= '?'.substr($param_str, 0, (strlen($param_str)-1));
+        }
+        return $url;
+    }
 }
-
-
-
 ?>

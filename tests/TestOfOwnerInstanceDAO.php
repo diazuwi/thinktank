@@ -9,6 +9,7 @@ require_once $SOURCE_ROOT_PATH.'webapp/model/class.Utils.php';
 require_once $SOURCE_ROOT_PATH.'webapp/model/class.OwnerInstance.php';
 
 class TestOfOwnerInstanceDAO extends ThinkTankUnitTestCase {
+    var $logger;
 
     function TestOfOwnerInstanceDAO() {
         $this->UnitTestCase('OwnerInstanceDAO class test');
@@ -16,10 +17,13 @@ class TestOfOwnerInstanceDAO extends ThinkTankUnitTestCase {
 
     function setUp() {
         parent::setUp();
+        $this->logger = Logger::getInstance();
     }
 
     function tearDown() {
         parent::tearDown();
+        $this->logger->close();
+
     }
 
     function testInsertOwnerInstance() {
@@ -59,6 +63,4 @@ class TestOfOwnerInstanceDAO extends ThinkTankUnitTestCase {
         $this->assertEqual($tokens['oauth_access_token'], 'ccc');
         $this->assertEqual($tokens['oauth_access_token_secret'], 'ddd');
     }
-
-
 }

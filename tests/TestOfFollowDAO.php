@@ -9,6 +9,8 @@ require_once $SOURCE_ROOT_PATH.'webapp/model/class.User.php';
 require_once $SOURCE_ROOT_PATH.'webapp/model/class.Follow.php';
 
 class TestOfFollowDAO extends ThinkTankUnitTestCase {
+    var $logger;
+
 
     function TestOfFollowDAO() {
         $this->UnitTestCase('FollowDAO class test');
@@ -16,6 +18,7 @@ class TestOfFollowDAO extends ThinkTankUnitTestCase {
 
     function setUp() {
         parent::setUp();
+        $this->logger = Logger::getInstance();
 
         //Insert test data into test table
         $q = "INSERT INTO tt_users (user_id, user_name, full_name, avatar) VALUES (12, 'jack', 'Jack Dorsey', 'avatar.jpg');";
@@ -49,6 +52,7 @@ class TestOfFollowDAO extends ThinkTankUnitTestCase {
 
     function tearDown() {
         parent::tearDown();
+        $this->logger->close();
     }
 
     function testCreateNewFollowDAO() {
