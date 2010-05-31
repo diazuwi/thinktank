@@ -44,9 +44,10 @@ class InstallerError extends Exception {
           $message .= "<li>$msg</li>";
         }
         $message .= '</ul>';
-        $message .= '<p>You can reinstall your ThinkTank by clicking <a href="'.
+        $message .= '<p>You can reinstall your ThinkTank by clearing out ThinkTank ' .
+                    'database and then click <a href="'.
                     THINKTANK_BASE_URL . 'install/">here</a></p>';
-        $title = 'Installation is Not Complete';
+        $title    = 'Installation is Not Complete';
         $this->message = $message;
         break;
       case Installer::ERROR_INSTALL_COMPLETE:
@@ -437,9 +438,9 @@ class Installer {
           // TODO: when table already exists, ask for repairing
           throw new InstallerError(
             "<p><strong>Ups!</strong> ThinkTank tables exist. If you're considering ".
-            "to install ThinkTank from scratch please clear ThinkTank tables in ".
+            "to install ThinkTank from scratch please clear out ThinkTank tables in ".
             "<code>{$config['db_name']}</code> database. If you're planning to ".
-            "repair your table click <a href=\"" . THINKTANK_BASE_URL . "install/repair.php\">here</a>.</p>",
+            "repair your table click <a href=\"" . THINKTANK_BASE_URL . "install/repair.php?db=1\">here</a>.</p>",
             self::ERROR_DB_TABLES_EXIST
           );
         }
@@ -534,7 +535,9 @@ class Installer {
     // table present
     $table_present = true;
     if ( !self::isThinkTankTablesExist($THINKTANK_CFG) ) {
-      self::$__errorMessages[] = 'ThinkTank Table is not fully available.';
+      self::$__errorMessages[] = 'ThinkTank table is not fully available. ' .
+                                 'You can repair your ThinkTank database by ' .
+                                 'clicking <a href="repair.php?db=1">here</a>';
       $table_present = false;
     }
     

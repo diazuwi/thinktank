@@ -15,13 +15,8 @@ if ( file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   require_once THINKTANK_WEBAPP_PATH . 'config.inc.php';
   
   try {
-    // check if $THINKTANK_CFG related to path exists
-    if ( $installer->checkPath($THINKTANK_CFG) ) {
-      throw new InstallerError('', Installer::ERROR_INSTALL_COMPLETE);
-    }
-    
     // check if ThinkTank is installed
-    if ( $installer->isThinkTankInstalled($THINKTANK_CFG) ) {
+    if ( $installer->isThinkTankInstalled($THINKTANK_CFG) && $installer->checkPath($THINKTANK_CFG) ) {
       throw new InstallerError('', Installer::ERROR_INSTALL_COMPLETE);
     }
   } catch (InstallerError $e) {
