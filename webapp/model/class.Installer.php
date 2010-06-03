@@ -23,8 +23,12 @@ class InstallerError extends Exception {
       case Installer::ERROR_SITE_EMAIL:
         $title = 'Invalid Site Email';
         break;
+      case Installer::ERROR_CONFIG_FILE_MISSING:
+        $title = 'Missing Configuration File';
+        break;
       case Installer::ERROR_CONFIG_SAMPLE_MISSING:
         $title = 'Missing Sample Configuration File';
+        break;
       case Installer::ERROR_CONFIG_SOURCE_ROOT_PATH:
       case Installer::ERROR_CONFIG_SMARTY_PATH:
       case Installer::ERROR_CONFIG_LOG_LOCATION:
@@ -40,11 +44,33 @@ class InstallerError extends Exception {
         $message = 'It seems ThinkTank not already fully installed. Here ' .
                    'are some informations: <br><ul>';
         $messages = Installer::getErrorMessages();
-        foreach ($messages as $msg) {
+        $uriToRepair = array();
+        foreach ($messages as $key => $msg) {
+          switch ($key) {
+            case 'config_file':
+              $uriToRepair[$key] = 'config=1';
+              break;
+            case 'table':
+              $uriToRepair[$key] = 'db=1';
+              break;
+            case 'admin':
+              $uriToRepair[$key] = 'admin=1';
+              break;
+          }
           $message .= "<li>$msg</li>";
         }
         $message .= '</ul>';
-        $message .= '<p>You can reinstall your ThinkTank by clearing out ThinkTank ' .
+        
+        $uriToRepairStr = '';
+        if ( !empty($uriToRepair) ) {
+          $uriToRepairStr = implode('&', $uriToRepair);
+        }
+        
+        $message .= '<p>You can repair your ThinkTank database by ' .
+                    'clicking <a href="' . THINKTANK_BASE_URL . 'install/repair.php?'.$uriToRepairStr.'">here</a>. ' .
+                    'Repairing will fix the errors encountered and will try to keep your old data that ' .
+                    'still exist. If you\'re planning to reinstall ThinkTank freshly regardless of lossing your ' .
+                    'old data, you can reinstall your ThinkTank by clearing out ThinkTank ' .
                     'database and then click <a href="'.
                     THINKTANK_BASE_URL . 'install/">here</a></p>';
         $title    = 'Installation is Not Complete';
@@ -54,6 +80,12 @@ class InstallerError extends Exception {
         $message = 'It seems ThinkTank already installed.';
         $title = 'ThinkTank already installed';
         $this->message = $message;
+        break;
+      case Installer::ERROR_REPAIR_CONFIG:
+        $title = 'Repair Configuration Error';
+        break;
+      case Installer::ERROR_REQUIREMENTS:
+        $title = 'Requirement is not met';
         break;
     }
     
@@ -147,14 +179,17 @@ class Installer {
   const ERROR_DB_TABLES_EXIST = 5;
   const ERROR_SITE_NAME = 6;
   const ERROR_SITE_EMAIL = 7;
-  const ERROR_CONFIG_SAMPLE_MISSING = 8;
-  const ERROR_CONFIG_SOURCE_ROOT_PATH = 9;
-  const ERROR_CONFIG_SMARTY_PATH = 10;
-  const ERROR_CONFIG_LOG_LOCATION = 11;
-  const ERROR_TYPE_MISMATCH = 12;
-  const ERROR_INSTALL_PATH_EXISTS = 13;
-  const ERROR_INSTALL_NOT_COMPLETE = 14;
-  const ERROR_INSTALL_COMPLETE = 15;
+  const ERROR_CONFIG_FILE_MISSING = 8;
+  const ERROR_CONFIG_SAMPLE_MISSING = 9;
+  const ERROR_CONFIG_SOURCE_ROOT_PATH = 10;
+  const ERROR_CONFIG_SMARTY_PATH = 11;
+  const ERROR_CONFIG_LOG_LOCATION = 12;
+  const ERROR_TYPE_MISMATCH = 13;
+  const ERROR_INSTALL_PATH_EXISTS = 14;
+  const ERROR_INSTALL_NOT_COMPLETE = 15;
+  const ERROR_INSTALL_COMPLETE = 16;
+  const ERROR_REPAIR_CONFIG = 17;
+  const ERROR_REQUIREMENTS = 18;
   
 /**
  * Stores current version of ThinkTank
@@ -192,6 +227,12 @@ class Installer {
  * Database object
  */
   public static $db;
+  
+/**
+ * Temporary var. Helper
+ * when hold temporary var between method calls
+ */
+  public static $tmp_var;
   
 /**
  * Private constructor, so can't be accessed
@@ -478,15 +519,50 @@ class Installer {
       return false;
     }
   }
-  
+
+/** 
+ * check if $tablename Ok
+ * @param string $tablename Table name
+ * @return bool true if $tablename ok
+ */
+  function isTableOk($tablename) {
+    global $THINKTANK_CFG;
+    if ( !self::$db ) {
+      self::setDb($THINKTANK_CFG);
+    }
+    
+    $q = "CHECK TABLE {$THINKTANK_CFG['table_prefix']}{$tablename};";
+    $sql_result = self::$db->exec($q);
+    $row = @mysql_fetch_array($sql_result);
+    
+    $okay = false;
+    if ( isset($row['Msg_text']) && $row['Msg_text'] == 'OK' ) {
+      $okay = true;
+    } else {
+      self::$tmp_var = $row['Msg_text'];
+    }
+    mysql_free_result($sql_result);
+    
+    if ( $okay ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+/**
+ * Check is there's at least one admin user
+ * @return bool
+ */  
   function isAdminExists() {
     global $THINKTANK_CFG;
     if ( !self::$db ) {
       self::setDb($THINKTANK_CFG);
     }
     
-    if ( !self::isThinkTankTablesExist($THINKTANK_CFG) ) {
-      throw new InstallerError('', self::ERROR_INSTALL_NOT_COMPLETE);
+    // check if table owners exists
+    if ( !self::isTableOk('owners') ) {
+      return false;
     }
     
     $q = "SELECT id FROM {$THINKTANK_CFG['table_prefix']}owners WHERE is_admin = 1 LIMIT 1;";
@@ -516,14 +592,14 @@ class Installer {
       global $THINKTANK_CFG;
       $config_file_exists = true;
     } else {
-      self::$__errorMessages[] = "Config file doesn't exist.";
+      self::$__errorMessages['config_file'] = "Config file doesn't exist.";
       return false;
     }
     
     // check version is met
     $version_met = self::checkStep1();
     if ( !$version_met ) {
-      self::$__errorMessages[] = "Requirements are not met. " .
+      self::$__errorMessages['requirements'] = "Requirements are not met. " .
         "Make sure your PHP version >= " . self::$__requiredVersion['php'] .
         " and you have cURL and GD extension installed.";
       return false;
@@ -535,16 +611,14 @@ class Installer {
     // table present
     $table_present = true;
     if ( !self::isThinkTankTablesExist($THINKTANK_CFG) ) {
-      self::$__errorMessages[] = 'ThinkTank table is not fully available. ' .
-                                 'You can repair your ThinkTank database by ' .
-                                 'clicking <a href="repair.php?db=1">here</a>';
+      self::$__errorMessages['table'] = 'ThinkTank table is not fully available.';
       $table_present = false;
     }
     
     // one owner exists and has is_admin = 1
     $admin_exists = true;
     if ( !self::isAdminExists($THINKTANK_CFG) ) {
-      self::$__errorMessages[] = "There's no admin user.";
+      self::$__errorMessages['admin'] = "There's no admin user.";
       $admin_exists = false;
     }
     
@@ -553,9 +627,11 @@ class Installer {
 
 /**
  * populate table / execute queries in queries.php
- * @param $config array database configuration
+ * @param array $config database configuration
+ * @param bool $verbose database configuration
+ * @return mixed
  */  
-  function populateTables($config) {
+  function populateTables($config, $verbose = false) {
     $table = array();
     foreach (self::$tables as $t) {
       $table[$t] = $config['table_prefix'] . $t;
@@ -578,7 +654,72 @@ class Installer {
       }
     }
     
-    return true;
+    if ( $verbose ) {
+      return $install_queries['for_update'];
+    } else {
+      return true;
+    }
+  }
+  
+  function repairTables() {
+    global $THINKTANK_CFG;
+    if ( !self::$showTables ) {
+      self::showTables($THINKTANK_CFG);
+    }
+    
+    // check total tables is the same with the default defined
+    $total_table_found = 0;
+    if ( count(self::$showTables) > 0 ) { // database contains tables
+      foreach ( self::$tables as $table ) {
+        if ( in_array($config['table_prefix'] . $table, self::$showTables) ) {
+          $total_table_found++;
+        }
+      }
+    }
+    
+    // does checking on tables that exist
+    $okay = true;
+    $table = '';
+    $messages = array();
+    foreach (self::$tables as $t) {
+      $table = $THINKTANK_CFG['table_prefix'] . $t;
+      if ( self::isTableOk($table) ) {        
+        $messages[$t] = "<p>The <code>$table</code> table is <strong class=\"okay\">okay</strong>.</p>";
+      } else {
+        $messages[$t]  = "<p>The <code>$table</code> table is not <strong class=\"not_okay\">okay</strong>. ";
+        $messages[$t] .= "It is reporting the following error: <code>{self::$tmp_var}</code>. ";
+        $messages[$t] .= "ThinkTank will attempt to repair this table&hellip;";
+        
+        // repairs table that not okay
+        $q = "REPAIR TABLE $table;";
+       
+        $sql_result = self::$db->exec($q);
+        $row = @mysql_fetch_array($sql_result);
+        
+        if ( isset($row['Msg_text']) && $row['Msg_text'] == 'OK' ) {
+          $messages[$t] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;Sucessfully repaired the $table table.";
+        } else { // failed to repair the table
+          $messages[$t] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;Failed to repair the $table table. " .
+                           "Error: {$row['Msg_text']}<br />";
+          self::$__errorMessages[$t] = "Failed to repair the $table table.";
+        }
+        
+        $messages[$t] .= "</p>";
+        mysql_free_result($sql_result);
+      }
+    }
+    
+    // show missing table
+    if ( $total_table_found > 0 ) {
+      $messages['missing_tables']  = "<p>There are $total_table_found missing tables. ";
+      $messages['missing_tables'] .= "ThinkTank will attempt to create these tables&hellip;";
+      
+      $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;Create and alter some tables.";
+      $query_logs .= self::populateTables($THINKTANK_CFG, true);
+      foreach ( $queries_log as $log ) {
+        $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$log";
+      }
+    }
   }
   
 /**
@@ -1133,6 +1274,105 @@ class Installer {
     }
     self::$methodName();
     self::$__view->display('installer.step.' . $step . '.tpl');
+  }
+
+/**
+ * Repairing page
+ * @param array $params
+ * @return void
+ */  
+  function repairPage($params = null) {
+    $config_file = THINKTANK_WEBAPP_PATH . 'config.inc.php';
+    
+    // check requirements
+    if ( !self::checkStep1() ) {
+      try {
+        throw new InstallerError(
+          "Requirements are not met. " .
+          "Make sure your PHP version >= " . self::$__requiredVersion['php'] .
+          " and you have cURL and GD extension installed.", self::ERROR_REQUIREMENTS
+        );
+      } catch (InstallerError $e) {
+        $e->showError();
+      }
+    }
+    
+    // check file configuration
+    if ( !file_exists($config_file) ) {
+      try {
+        throw new InstallerError(
+          '<p>Sorry, ThinkTank Repairer need a <code>config.inc.php</code> file to work from. ' .
+          'Please upload this file to <code>' . THINKTANK_WEBAPP_PATH . '</code> or ' .
+          'copy / rename from <code>' . THINKTANK_WEBAPP_PATH . 'config.sample.inc.php</code> to ' .
+          '<code>' . THINKTANK_WEBAPP_PATH . 'config.inc.php</code>. If you don\'t have permission to ' .
+          'do this, you can reinstall ThinkTank by ' .
+          'clearing out ThinkTank tables and then clicking <a href="' . THINKTANK_BASE_URL . 'install/">here</a>',
+          self::ERROR_CONFIG_FILE_MISSING
+        );
+      } catch (InstallerError $e) {
+        $e->showError();
+      }
+    }
+    require_once $config_file;
+    
+    // check database
+    try {
+      self::checkDb($THINKTANK_CFG);
+    } catch (InstallerError $e) {
+      $e->showError();
+    }
+    
+    // check $THINKTANK_CFG['repair'] is set to true
+    if ( !isset($THINKTANK_CFG['repair']) or !$THINKTANK_CFG['repair'] ) {
+      try {
+        throw new InstallerError(
+          'To do repairing ' .
+          'you must define<br><code>$THINKTANK_CFG[\'repair\'] = true;</code><br>in ' .
+          'your configuration file at <code>' . THINKTANK_WEBAPP_PATH . 'config.inc.php</code>',
+          self::ERROR_REPAIR_CONFIG
+        );
+      } catch (InstallerError $e) {
+        $e->showError();
+      }
+    }
+    
+    // clearing error messages before doing the repair
+    if ( !empty(self::$__errorMessages) ) {
+      self::$__errorMessages = array();
+    }
+    
+    // do repairing when form is posted and $_GET is not empty
+    if ( isset($_POST['repair']) && !empty($_GET) ) {
+      self::$__view->assign('posted', true);
+      $succeed = false;
+      $messages = array();
+      
+      // check if we repairing db
+      if ( isset($params['db']) ) {
+        $messages['db'] = self::repairTables();
+      }
+      
+      // check if we need to create admin user
+      if ( isset($params['admin']) ) {
+        $messages['admin'] = '';
+      }
+      
+      if ( !empty(self::$__errorMessages) ) {
+        // failed repairing
+      } else {
+        $succeed = true;
+      }
+      
+      self::$__view->assign('succeed', $succeed);
+    } else {
+      // set var for user's form
+      if ( isset($params['admin']) ) {
+        self::$__view->assign('owner_name', 'Your Name');
+        self::$__view->assign('site_email', 'username@example.com');
+      }
+    }
+    
+    self::$__view->display('installer.repair.tpl');
   }
 
 /**
