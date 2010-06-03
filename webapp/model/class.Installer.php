@@ -77,7 +77,14 @@ class InstallerError extends Exception {
         $this->message = $message;
         break;
       case Installer::ERROR_INSTALL_COMPLETE:
-        $message = 'It seems ThinkTank already installed.';
+        $message  = '<p>It seems ThinkTank already installed. ';
+        $message .= 'You can repair your ThinkTank database by ' .
+                    'clicking <a href="' . THINKTANK_BASE_URL . 'install/repair.php">here</a>. ' .
+                    'Repairing will fix the errors encountered and will try to keep your old data that ' .
+                    'still exist. If you\'re planning to reinstall ThinkTank freshly regardless of lossing your ' .
+                    'old data, you can reinstall your ThinkTank by clearing out ThinkTank ' .
+                    'database and then click <a href="'.
+                    THINKTANK_BASE_URL . 'install/">here</a></p>';
         $title = 'ThinkTank already installed';
         $this->message = $message;
         break;
@@ -1365,13 +1372,22 @@ class Installer {
       
       self::$__view->assign('succeed', $succeed);
     } else {
-      // set var for user's form
-      if ( isset($params['admin']) ) {
-        self::$__view->assign('owner_name', 'Your Name');
-        self::$__view->assign('site_email', 'username@example.com');
+      if ( empty($params) ) {
+        self::$__view->assign('show_form', 0);
+      } else {
+        self::$__view->assign('show_form', 1);
+        // set var for user's form
+        if ( isset($params['admin']) ) {
+          self::$__view->assign('owner_name', 'Your Name');
+          self::$__view->assign('site_email', 'username@example.com');
+          self::$__view->assign('admin_form', 1);
+        }
+        
+        self::$__view->assign('action_form', $_SERVER['REQUEST_URI']);
       }
     }
     
+    self::$__view->assign('subtitle', 'Repairing');
     self::$__view->display('installer.repair.tpl');
   }
 
