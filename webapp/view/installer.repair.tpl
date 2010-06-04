@@ -36,7 +36,8 @@
         
         {elseif $show_form}
         <form class="input" name="form1" method="post" action="{$action_form}">
-        <div class="clearfix info_message">
+          {if $admin_form}
+          <div class="clearfix info_message">
             <strong>My Dear!</strong> ThinkTank need a name and your email (for administrator). 
             This information will be written into config.inc.php
           </div>
@@ -242,7 +243,7 @@
               <span class="input_information">Your Country.</span>
             </div>
           </div>
-        
+          {/if}
           <div class="clearfix append_20">
             <div class="grid_10 prefix_9 left">
               <input type="submit" name="repair" class="tt-button ui-state-default ui-priority-secondary ui-corner-all" value="Repair &raquo">

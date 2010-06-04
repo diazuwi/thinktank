@@ -652,7 +652,7 @@ class Installer {
     require_once $query_file;
     
     $install_queries = self::examineQueries($install_queries);
-    
+    echo '<pre>'; 
     foreach ($install_queries['queries'] as $query) {
       try {
         self::$db->exec($query);
@@ -660,6 +660,7 @@ class Installer {
         $e->getMessage();
       }
     }
+    die;
     
     if ( $verbose ) {
       return $install_queries['for_update'];
@@ -668,8 +669,7 @@ class Installer {
     }
   }
   
-  function repairTables() {
-    global $THINKTANK_CFG;
+  function repairTables($THINKTANK_CFG) {
     if ( !self::$showTables ) {
       self::showTables($THINKTANK_CFG);
     }
@@ -678,7 +678,7 @@ class Installer {
     $total_table_found = 0;
     if ( count(self::$showTables) > 0 ) { // database contains tables
       foreach ( self::$tables as $table ) {
-        if ( in_array($config['table_prefix'] . $table, self::$showTables) ) {
+        if ( in_array($THINKTANK_CFG['table_prefix'] . $table, self::$showTables) ) {
           $total_table_found++;
         }
       }
@@ -832,7 +832,7 @@ class Installer {
               // Get the field type from the query
               preg_match("|".$tablefield->Field." ([^ ]*( unsigned)?)|i", $cfields[strtolower($tablefield->Field)], $matches);
               $fieldtype = $matches[1];
-
+              
               // Is actual field type different from the field type in query?
               if($tablefield->Type != $fieldtype) {
                 // Add a query to change the column type
@@ -874,7 +874,6 @@ class Installer {
           while ( $row = @mysql_fetch_object($sql_result) ) {
             $tableindices[] = $row;
           }
-
           if($tableindices) {
             // Clear the index array
             unset($index_ary);
@@ -885,18 +884,20 @@ class Installer {
               $keyname = $tableindex->Key_name;
               $index_ary[$keyname]['columns'][] = array('fieldname' => $tableindex->Column_name, 'subpart' => $tableindex->Sub_part);
               $index_ary[$keyname]['unique'] = ($tableindex->Non_unique == 0)?true:false;
+              $index_ary[$keyname]['fulltext'] = ($tableindex->Index_type == 'FULLTEXT')?true:false;
             }
-
+            
             // For each actual index in the index array
             foreach($index_ary as $index_name => $index_data) {
               // Build a create string to compare to the query
               $index_string = '';
-              if($index_name == 'PRIMARY') {
+              if ($index_name == 'PRIMARY') {
                 $index_string .= 'PRIMARY ';
-              }
-              else if($index_data['unique']) {
+              } else if ($index_data['unique']) {
                 $index_string .= 'UNIQUE ';
-              }
+              } else if ($index_data['fulltext']) {
+                $index_string .= 'FULLTEXT ';
+              } 
               $index_string .= 'KEY ';
               if($index_name != 'PRIMARY') {
                 $index_string .= $index_name;
@@ -920,7 +921,7 @@ class Installer {
               //else echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">{$table}:<br /><b>Did not find index:</b>".$index_string."<br />".print_r($indices, true)."</pre>\n";
             }
           }
-
+          
           // For every remaining index specified for the table
           foreach ( (array) $indices as $index ) {
             // Push a query line into $cqueries that adds the index to that table
@@ -1356,7 +1357,7 @@ class Installer {
       
       // check if we repairing db
       if ( isset($params['db']) ) {
-        $messages['db'] = self::repairTables();
+        $messages['db'] = self::repairTables($THINKTANK_CFG);
       }
       
       // check if we need to create admin user
@@ -1376,6 +1377,7 @@ class Installer {
         self::$__view->assign('show_form', 0);
       } else {
         self::$__view->assign('show_form', 1);
+        
         // set var for user's form
         if ( isset($params['admin']) ) {
           self::$__view->assign('owner_name', 'Your Name');
