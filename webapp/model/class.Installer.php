@@ -425,6 +425,11 @@ class Installer {
     if ( !self::$db ) {
       self::setDb($config);
     }
+    try {
+      $c = self::$db->getConnection();
+    } catch (Exception $e) {
+      $e->getMessage();
+    }
     
     $sql_result = self::$db->exec('SHOW TABLES');
     $tables = array();
@@ -1273,6 +1278,16 @@ class Installer {
   function getErrorMessages() {
     return self::$__errorMessages;
   }
+
+/**
+ * Clear error messages.
+ * 
+ * @access public
+ * @return void
+ */  
+  function clearErrorMessages() {
+    self::$__errorMessages = array();
+  }
   
 /**
  * Installation steps page
@@ -1351,7 +1366,7 @@ class Installer {
     
     // clearing error messages before doing the repair
     if ( !empty(self::$__errorMessages) ) {
-      self::$__errorMessages = array();
+      self::clearErrorMessages();
     }
     
     // do repairing when form is posted and $_GET is not empty

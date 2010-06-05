@@ -23,7 +23,11 @@ if ( file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
     $e->showError();
   }
 }
-
-$step = (int) $_GET['step'];
+// clear error messages after called isThinkTankInstalled successfully
+$installer->clearErrorMessages();
+$step = 1;
+if ( isset($_GET['step']) ) {
+  $step = (int) $_GET['step'];
+}
 $installer->installPage($step);
 ?>
