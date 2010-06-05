@@ -3,6 +3,7 @@
     <div class="clearfix prepend_20 append_20">
       <div class="grid_22 push_1 clearfix">
         <h2 class="clearfix step_title">Repairing</h2>
+        {$info}
         {if $posted}
         {if $succeed}
         <div class="clearfix success_message">
@@ -33,33 +34,9 @@
         </div>
         {/if}
         
-        {if $repair.db}
-        <div class="clearfix append_20">
-          <div class="grid_6 prefix_5 right">
-            {if $permission.logs && $permission.compiled_view && $permission.cache}
-            <span class="label">Template and Log directories are writeable?</span>
-            {else}
-            <span class="label no">Template and Log directories are writeable?</span>
-            {/if}
-          </div>
-          <div class="grid_8 prefix_1 left">
-            {if $permission.logs && $permission.compiled_view && $permission.cache}
-            <span class="value yes">Yes</span>
-            {else}
-            <span class="value no">No</span>
-            {/if}
-          </div>
-        </div>
-        {/if}
-        
         {elseif $show_form}
         <form class="input" name="form1" method="post" action="{$action_form}">
           {if $admin_form}
-          <div class="clearfix info_message">
-            <strong>My Dear!</strong> ThinkTank need a name and your email (for administrator). 
-            This information will be written into config.inc.php
-          </div>
-          
           <div class="clearfix append_20">
             <div class="grid_5 prefix_3 right">
               <label>Your Name</label>
@@ -263,7 +240,7 @@
           </div>
           {/if}
           <div class="clearfix append_20">
-            <div class="grid_10 prefix_9 left">
+            <div class="grid_10 prefix_7 left">
               <input type="submit" name="repair" class="tt-button ui-state-default ui-priority-secondary ui-corner-all" value="Repair &raquo">
             </div>
           </div>
