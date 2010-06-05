@@ -285,7 +285,7 @@ class Installer {
  */
   function checkVersion() {
     $ret = false;
-    $ret = version_compare( phpversion(), $this->__requiredVersion['php'], '>=' );
+    $ret = version_compare( phpversion(), self::$__requiredVersion['php'], '>=' );
     
     return $ret;
   }
