@@ -1,4 +1,10 @@
 <?php
+/**
+ * Instance Data Access Object Interface
+ *
+ * @author Gina Trapani <ginatrapani[at]gmail[dot]com>
+ *
+ */
 interface InstanceDAO {
     public function insert($network_user_id, $network_username, $network = "twitter", $viewer_id = false);
 
@@ -7,6 +13,8 @@ interface InstanceDAO {
     public function getInstanceOneByLastRun($order);
 
     public function getByUsername($username);
+
+    public function getByUsernameOnNetwork($username, $network);
 
     public function getByUserId($network_user_id);
 
@@ -25,5 +33,8 @@ interface InstanceDAO {
     public function updateLastRun($id);
 
     public function isUserConfigured($username);
+
+    public function getByUserAndViewerId($network_user_id, $viewer_id);
+
+    public function getByViewerId($viewer_id);
 }
-?>

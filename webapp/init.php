@@ -60,15 +60,12 @@ require_once 'model/interface.CrawlerPlugin.php';
 require_once 'model/interface.WebappPlugin.php';
 require_once 'model/class.WebappTab.php';
 require_once 'model/class.WebappTabDataset.php';
-
-# crawler only
 require_once 'model/class.Logger.php';
-
-# webapp only
 require_once 'model/class.Follow.php';
 require_once 'model/class.Webapp.php';
-
-
+require_once 'controller/interface.Controller.php';
+require_once 'controller/class.ThinkTankController.php';
+require_once 'controller/class.ThinkTankAuthController.php';
 require_once 'config.inc.php';
 
 $config = Config::getInstance();
@@ -89,11 +86,11 @@ $webapp = new Webapp();
 $crawler = new Crawler();
 
 // Instantiate global database variable
+//@TODO remove this when the PDO port is complete
 try {
     $db = new Database($THINKTANK_CFG);
     $conn = $db->getConnection();
-}
-catch(Exception $e) {
+} catch(Exception $e) {
     echo $e->getMessage();
 }
 
@@ -108,4 +105,3 @@ foreach ($active_plugins as $ap) {
         require_once $includefile;
     }
 }
-?>

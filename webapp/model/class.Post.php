@@ -1,4 +1,9 @@
 <?php
+/**
+ * Post
+ * A post, tweet, or status update on a ThinkTank source network or service (like Twitter or Facebook)
+ * @author Gina Trapani <ginatrapani[at]gmail[dot]com>
+ */
 class Post {
     var $id;
     var $post_id;
@@ -45,6 +50,11 @@ class Post {
 
 }
 
+/**
+ * Post Data Access Object
+ * The data access object for retrieving and saving posts in the ThinkTank database
+ * @author Gina Trapani <ginatrapani[at]gmail[dot]com>
+ */
 
 class PostDAO extends MySQLDAO {
 
@@ -252,13 +262,13 @@ class PostDAO extends MySQLDAO {
                 $vals[$key] = mysql_real_escape_string($value);
             }
             $post_sql = $vals['post_text'];
-            if ($vals['in_reply_to_user_id'] == '') {
+            if (!isset($vals['in_reply_to_user_id']) || $vals['in_reply_to_user_id'] == '') {
                 $post_in_reply_to_user_id = 'NULL';
             } else {
                 $post_in_reply_to_user_id = $vals['in_reply_to_user_id'];
             }
 
-            if ($vals['in_reply_to_post_id'] == '') {
+            if (!isset($vals['in_reply_to_post_id']) || $vals['in_reply_to_post_id'] == '') {
                 $post_in_reply_to_post_id = 'NULL';
             } else {
                 $post_in_reply_to_post_id = $vals['in_reply_to_post_id'];
@@ -299,7 +309,7 @@ class PostDAO extends MySQLDAO {
 
                 if (isset($vals['in_retweet_of_post_id']) && $vals['in_retweet_of_post_id'] != '' && $this->isPostInDB($vals['in_retweet_of_post_id'])) {
                     $this->incrementRepostCountCache($vals['in_retweet_of_post_id']);
-                    $status_message = "Repost of ".$vals['in_retweet_of_post_id'].", ID: ".$vals["post_id"]."; updating retweet cache count";
+                    $status_message = "Repost of ".$vals['in_retweet_of_post_id']." by ".$vals["user_name"]." ID: ".$vals["post_id"]."; updating retweet cache count";
                     $this->logger->logStatus($status_message, get_class($this));
                     $status_message = "";
                 }
@@ -851,28 +861,4 @@ class PostErrorDAO extends MySQLDAO {
     }
 }
 
-class RetweetDetector {
-
-    public function __construct() {
-    }
-
-    public static function isRetweet($post, $ownerName) {
-        if (strpos(strtolower($post), strtolower("RT @".$ownerName)) === false)
-        return false;
-        else
-        return true;
-    }
-
-
-    public static function detectOriginalTweet($retweet_text, $recentPosts) {
-        $originalPostId = false;
-        foreach ($recentPosts as $t) {
-            $snip = substr($t->post_text, 0, 24);
-            if (strpos($retweet_text, $snip) != false)
-            $originalPostId = $t->post_id;
-        }
-
-        return $originalPostId;
-    }
-}
 ?>

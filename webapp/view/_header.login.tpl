@@ -31,7 +31,7 @@
             <option value="">-- Select an instance --</option>
             {foreach from=$instances key=tid item=i}
               {if $i->network_user_id != $instance->network_user_id}
-                <option value="{$site_root_path}?u={$i->network_username|urlencode}">{$i->network_username} - {$i->network|capitalize} (updated {$i->crawler_last_run|relative_datetime} ago{if !$i->is_active} (paused){/if})</option>
+                <option value="{$site_root_path}?u={$i->network_username|urlencode}&n={$i->network|urlencode}">{$i->network_username} - {$i->network|capitalize} (updated {$i->crawler_last_run|relative_datetime} ago{if !$i->is_active} (paused){/if})</option>
               {/if}
             {/foreach}
           </select>
@@ -39,7 +39,9 @@
         </span>
       {else}
         <!-- the user has not selected an instance -->
-        Last update: {$crawler_last_run|relative_datetime}
+        {if $crawler_last_run}
+        Last update: {$crawler_last_run|relative_datetime} ago
+        {/if}
       {/if}
     </div> <!-- end .status-bar-left -->
     
@@ -58,7 +60,7 @@
 
 <div class="container clearfix">
   
-  <div id="app-title"><a href="{$site_root_path}?u={$smarty.session.network_username}">
+  <div id="app-title"><a href="{$site_root_path}{$logo_link}">
     <h1><span class="bold">Think</span><span class="gray">Tank</span></h1>
     <h2>Ask your friends</h2>
   </a></div> <!-- end #app-title -->
