@@ -6,12 +6,30 @@
         {if $posted}
         {if $succeed}
         <div class="clearfix success_message">
-          <strong>Great!</strong> Your system is met ThinkTank's requirements.
-          Click on the <strong>Next Step &raquo;</strong> button below to proceed the next step
+          <p><strong>Repairs complete</strong>. Please remove the following line from config.inc.php to prevent this page from being used by unauthorized users.</p><code>$THINKTANKCFG['repair'] = true;</code>
+        </div>
+        <div class="clearfix">
+          {foreach from=$messages_db item=msg}
+            {$msg}
+          {/foreach}
+          {foreach from=$messages_admin item=msg}
+            {$msg}
+          {/foreach}
         </div>
         {else}
         <div class="clearfix error_message">
           <strong>Ups!</strong> Something goes wrong, read the hints below!
+        </div>
+        <div class="clearfix">
+          {foreach from=$messages_db item=msg}
+            {$msg}
+          {/foreach}
+          {foreach from=$messages_admin item=msg}
+            {$msg}
+          {/foreach}
+          {foreach from=$messages_error item=msg}
+            {$msg}
+          {/foreach}
         </div>
         {/if}
         

@@ -652,7 +652,6 @@ class Installer {
     require_once $query_file;
     
     $install_queries = self::examineQueries($install_queries);
-    echo '<pre>'; 
     foreach ($install_queries['queries'] as $query) {
       try {
         self::$db->exec($query);
@@ -660,7 +659,6 @@ class Installer {
         $e->getMessage();
       }
     }
-    die;
     
     if ( $verbose ) {
       return $install_queries['for_update'];
@@ -694,7 +692,7 @@ class Installer {
         $messages[$t] = "<p>The <code>$table</code> table is <strong class=\"okay\">okay</strong>.</p>";
       } else {
         $messages[$t]  = "<p>The <code>$table</code> table is not <strong class=\"not_okay\">okay</strong>. ";
-        $messages[$t] .= "It is reporting the following error: <code>{self::$tmp_var}</code>. ";
+        $messages[$t] .= "It is reporting the following error: <code>".self::$tmp_var."</code>. ";
         $messages[$t] .= "ThinkTank will attempt to repair this table&hellip;";
         
         // repairs table that not okay
@@ -717,16 +715,23 @@ class Installer {
     }
     
     // show missing table
-    if ( $total_table_found > 0 ) {
-      $messages['missing_tables']  = "<p>There are $total_table_found missing tables. ";
+    $total_table_not_found = count(self::$tables) - $total_table_found;
+    if ( $total_table_not_found > 0 ) {
+      $messages['missing_tables']  = "<p>There are $total_table_not_found missing tables. ";
       $messages['missing_tables'] .= "ThinkTank will attempt to create these tables&hellip;";
       
       $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;Create and alter some tables.";
-      $query_logs .= self::populateTables($THINKTANK_CFG, true);
-      foreach ( $queries_log as $log ) {
-        $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$log";
+      $queries_logs = self::populateTables($THINKTANK_CFG, true);
+      if ( !empty($queries_logs) ) {
+        foreach ( $queries_logs as $log ) {
+          $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$log";
+        }
       }
+    } else {
+      $messages['table_complete'] = '<p>Your ThinkTank tables are complete.</p>';
     }
+    
+    return $messages;
   }
   
 /**
@@ -1358,15 +1363,18 @@ class Installer {
       // check if we repairing db
       if ( isset($params['db']) ) {
         $messages['db'] = self::repairTables($THINKTANK_CFG);
+        self::$__view->assign('messages_db', $messages['db']);
       }
       
       // check if we need to create admin user
       if ( isset($params['admin']) ) {
         $messages['admin'] = '';
+        self::$__view->assign('messages_admin', $messages['admin']);
       }
       
       if ( !empty(self::$__errorMessages) ) {
         // failed repairing
+        self::$__view->assign('messages_error', self::$__errorMessages);
       } else {
         $succeed = true;
       }
