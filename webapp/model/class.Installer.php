@@ -681,34 +681,17 @@ class Installer {
         }
       }
     }
-    $messages = array();
-    
-    // show missing table
-    $total_table_not_found = count(self::$tables) - $total_table_found;
-    if ( $total_table_not_found > 0 ) {
-      $messages['missing_tables']  = "<p>There are <strong class=\"not_okay\">$total_table_not_found missing tables</strong>. ";
-      $messages['missing_tables'] .= "ThinkTank will attempt to create missing tables and alter existing tables if " .
-                                     " something is missing&hellip;";
-      $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;<span class=\"repair_log\">Create and alter some tables&hellip;</span>";
-      $queries_logs = self::populateTables($THINKTANK_CFG, true);
-      if ( !empty($queries_logs) ) {
-        foreach ( $queries_logs as $log ) {
-          $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class=\"repair_log\">$log</span>";
-        }
-      }
-    } else {
-      $messages['table_complete'] = '<p>Your ThinkTank tables are <strong class="okay">complete</strong>.</p>';
-    }
     
     // does checking on tables that exist
     $okay = true;
     $table = '';
+    $messages = array();
     foreach (self::$tables as $t) {
       $table = $THINKTANK_CFG['table_prefix'] . $t;
       if ( self::isTableOk($table) ) {        
         $messages[$t] = "<p>The <code>$table</code> table is <strong class=\"okay\">okay</strong>.</p>";
       } else {
-        $messages[$t]  = "<p>The <code>$table</code> table is <strong class=\"not_okay\">not okay</strong>. ";
+        $messages[$t]  = "<p>The <code>$table</code> table is not <strong class=\"not_okay\">okay</strong>. ";
         $messages[$t] .= "It is reporting the following error: <code>".self::$tmp_var."</code>. ";
         $messages[$t] .= "ThinkTank will attempt to repair this table&hellip;";
         
@@ -719,16 +702,33 @@ class Installer {
         $row = @mysql_fetch_array($sql_result);
         
         if ( isset($row['Msg_text']) && $row['Msg_text'] == 'OK' ) {
-          $messages[$t] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;<span class=\"repair_log\">Sucessfully repaired the $table table.</span>";
+          $messages[$t] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;Sucessfully repaired the $table table.";
         } else { // failed to repair the table
-          $messages[$t] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;<span class=\"repair_log\">Failed to repair the $table table. " .
-                           "Error: {$row['Msg_text']}</span><br />";
-          self::$__errorMessages[$t] = "<p class=\"repair_log\">Failed to repair the $table table.</p>";
+          $messages[$t] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;Failed to repair the $table table. " .
+                           "Error: {$row['Msg_text']}<br />";
+          self::$__errorMessages[$t] = "Failed to repair the $table table.";
         }
         
         $messages[$t] .= "</p>";
         mysql_free_result($sql_result);
       }
+    }
+    
+    // show missing table
+    $total_table_not_found = count(self::$tables) - $total_table_found;
+    if ( $total_table_not_found > 0 ) {
+      $messages['missing_tables']  = "<p>There are $total_table_not_found missing tables. ";
+      $messages['missing_tables'] .= "ThinkTank will attempt to create these tables&hellip;";
+      
+      $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;Create and alter some tables.";
+      $queries_logs = self::populateTables($THINKTANK_CFG, true);
+      if ( !empty($queries_logs) ) {
+        foreach ( $queries_logs as $log ) {
+          $messages['missing_tables'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$log";
+        }
+      }
+    } else {
+      $messages['table_complete'] = '<p>Your ThinkTank tables are complete.</p>';
     }
     
     return $messages;
@@ -1384,31 +1384,15 @@ class Installer {
       if ( empty($params) ) {
         self::$__view->assign('show_form', 0);
       } else {
-        $information_message = array();
         self::$__view->assign('show_form', 1);
-        if ( isset($params['db']) ) {
-          $information_message['db']  = 'Checking your existing ThinkTank tables. If some tables are missing, ';
-          $information_message['db'] .= 'ThinkTank will attempt to create those tables. ThinkTank will check every ThinkTank tables and ';
-          $information_message['db'] .= 'will attemp to repair those tables if the status is not okay.';
-        }
         
+        // set var for user's form
         if ( isset($params['admin']) ) {
           self::$__view->assign('owner_name', 'Your Name');
           self::$__view->assign('site_email', 'username@example.com');
           self::$__view->assign('admin_form', 1);
-          $information_message['admin'] = 'ThinkTank will attemp to create one admin user based on form below.';
         }
         
-        if ( !empty($information_message) ) {
-          $info  = '<div class="clearfix info_message">';
-          $info .= '<p><strong class="not_okay">Read before repairing!</strong> ';
-          $info .= 'ThinkTank Repairer will do the following actions when repairing: </p><ul>';
-          foreach ($information_message as $msg) {
-            $info .= "<li>$msg</li>";
-          }
-          $info .= '</ul></div>';
-          self::$__view->assign('info', $info);
-        }
         self::$__view->assign('action_form', $_SERVER['REQUEST_URI']);
       }
     }

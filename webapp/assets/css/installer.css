@@ -71,13 +71,8 @@ span.label, span.value {
   padding: 10px;
   margin-bottom: 20px;
 }
-.okay {color: green;}
+.okay {color: #0060E0;}
 .not_okay {color: red;}
-.repair_log {
-  font-family: Consolas,Monaco,Courier,monospace;
-  font-size: 11px;
-  color: green;
-}
 code {
   border: 1px solid #999;
   background-color: #ccc;
