@@ -14,7 +14,9 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   
   $message  = "<p>Config's file, <code>config.inc.php</code>, is not found! ";
   $message .= "No need to worry, this may happens if you're going install ThinkTank for the first time. ";
-  $message .= "Clik on the link below to start installation.";
+  $message .= "If you've installed ThinkTank before, you can create config file by copying or renaming ";
+  $message .= "<code>config.sample.inc.php</code> to <code>config.inc.php</code>. If you want to install ";
+  $message .= "ThinkTank clik on the link below to start installation.";
   $message .= '<div id="create-config-file" class="tt-button ui-state-default ui-priority-secondary ui-corner-all">';
   $message .= '<a href="install/">Start Installation!</a>';
   $message .= '</div>';
