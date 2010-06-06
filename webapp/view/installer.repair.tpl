@@ -5,35 +5,41 @@
         <h2 class="clearfix step_title">Repairing</h2>
         {$info}
         {if $posted}
-        {if $succeed}
-        <div class="clearfix success_message">
-          <p><strong>Repairs complete</strong>. Please remove the following line from config.inc.php to prevent this page from being used by unauthorized users.</p><code>$THINKTANKCFG['repair'] = true;</code>
-        </div>
-        <div class="clearfix">
-          {foreach from=$messages_db item=msg}
-            {$msg}
-          {/foreach}
-          {foreach from=$messages_admin item=msg}
-            {$msg}
-          {/foreach}
-        </div>
-        {else}
-        <div class="clearfix error_message">
-          <strong>Ups!</strong> Something goes wrong, read the hints below!
-        </div>
-        <div class="clearfix">
-          {foreach from=$messages_db item=msg}
-            {$msg}
-          {/foreach}
-          {foreach from=$messages_admin item=msg}
-            {$msg}
-          {/foreach}
-          {foreach from=$messages_error item=msg}
-            {$msg}
-          {/foreach}
-        </div>
-        {/if}
-        
+          {if $succeed}
+          <div class="clearfix success_message">
+            <p><strong>Repairs complete</strong>. Please remove the following line
+              from config.inc.php to prevent this page from being used by unauthorized users.</p>
+            <code>$THINKTANKCFG['repair'] = true;</code>
+            {if $username && password}
+              <p>Your newly created admin user: <strong>{$username}</strong>, password:
+                <strong>{$password}</strong>
+              </p>
+            {/if}
+          </div>
+          <div class="clearfix">
+            {foreach from=$messages_db item=msg}
+              {$msg}
+            {/foreach}
+            {foreach from=$messages_admin item=msg}
+              {$msg}
+            {/foreach}
+          </div>
+          {else}
+          <div class="clearfix error_message">
+            <strong>Ups!</strong> Something goes wrong, read the hints below!
+          </div>
+          <div class="clearfix">
+            {foreach from=$messages_db item=msg}
+              {$msg}
+            {/foreach}
+            {foreach from=$messages_admin item=msg}
+              {$msg}
+            {/foreach}
+            {foreach from=$messages_error item=msg}
+              {$msg}
+            {/foreach}
+          </div>
+          {/if}
         {elseif $show_form}
         <form class="input" name="form1" method="post" action="{$action_form}">
           {if $admin_form}
