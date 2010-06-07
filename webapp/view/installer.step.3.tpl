@@ -17,7 +17,7 @@
           </li>
           <li id="step-tab-3" class="no-border ui-state-default ui-corner-top ui-tabs-selected ui-state-active">
             <div class="key-stat install_step">
-            <h1>{if !empty($errors)}<span class="pass_step" id="pass-step-3">3</span>{else}3{/if}</h1>
+            <h1>{if empty($errors)}<span class="pass_step" id="pass-step-3">3</span>{else}3{/if}</h1>
             <h3>Finish</h3>
             </div>
           </li>
