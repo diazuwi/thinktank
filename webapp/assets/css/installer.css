@@ -29,6 +29,14 @@ code {
 #thinktank-tabs #step-tab-2 .install_step {width:430px;}
 #thinktank-tabs #step-tab-3 {width:220px;}
 #thinktank-tabs #step-tab-3 .install_step {width:220px;}
+.pass_step {
+  background: url(../img/yes.png) no-repeat 0 50%;
+  display: block;
+  min-height: 32px;
+}
+#pass-step-1 {background-position: 45px 50%;}
+#pass-step-2 {background-position: 28px 50%;}
+#pass-step-3 {background-position: 40px 50%;}
 .next_step {
   width: 250px;
   margin-top: 20px;

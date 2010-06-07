@@ -5,7 +5,7 @@
         <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
           <li id="step-tab-1" class="ui-state-default ui-corner-top">
             <div class="key-stat install_step">
-            <h1>1</h1>
+            <h1><span class="pass_step" id="pass-step-1">1</span></h1>
             <h3>Requirements Check</h3>
             </div>  
           </li>
