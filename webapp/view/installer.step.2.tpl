@@ -1,5 +1,33 @@
 {include file="_installer.header.tpl"}
+  <div class="container">
+    <div id="thinktank-tabs">
+      <div class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+        <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+          <li id="step-tab-1" class="ui-state-default ui-corner-top">
+            <div class="key-stat install_step">
+            <h1>1</h1>
+            <h3>Requirements Check</h3>
+            </div>  
+          </li>
+          <li id="step-tab-2" class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active">
+            <div class="key-stat install_step">
+            <h1>2</h1>
+            <h3>Database Setup and Site Configuration</h3>
+            </div>
+          </li>
+          <li id="step-tab-3" class="no-border ui-state-default ui-corner-top">
+            <div class="key-stat install_step">
+            <h1>3</h1>
+            <h3>Finish</h3>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
   <div id="installer-page" class="container_24 round-all">
+    <img id="dart2" class="dart" alt="" src="/assets/img/dart_wht.png">
     <div class="clearfix prepend_20 append_20">
       <div class="grid_22 push_1 clearfix">
         <form class="input" name="form1" method="post" action="index.php?step=3">

@@ -11,6 +11,7 @@ code {
   background-color: #FFF;
   margin-top: 20px;
 }
+#installer-page {margin-top: 42px;}
 .install_step {
   border-right:1px solid #CCCCCC;
   margin:10px 0;
@@ -19,6 +20,9 @@ code {
 .ui-state-default .install_step {color: #C0C0C0;}
 .ui-state-active .install_step {color: #333;}
 .no-border .install_step {border: none;}
+#dart1 {left: 100px;}
+#dart2 {left: 455px;}
+#dart3 {left: 780px;}
 #thinktank-tabs #step-tab-1 {width:285px;}
 #thinktank-tabs #step-tab-1 .install_step {width:285px;}
 #thinktank-tabs #step-tab-2 {width:430px;}

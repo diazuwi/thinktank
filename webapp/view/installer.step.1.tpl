@@ -27,7 +27,8 @@
   </div>
   
   <div id="installer-page" class="container_24 round-all">
-    <div class="clearfix prepend_20 append_20">
+    <img id="dart1" class="dart" alt="" src="/assets/img/dart_wht.png">
+    <div class="clearfix append_20">
       <div class="grid_22 push_1 clearfix">
         <h2 class="clearfix step_title">Requirements Check</h2>
         {if $permission.logs && $permission.compiled_view && $permission.cache && $php_compat && $libs.curl && $libs.gd}
