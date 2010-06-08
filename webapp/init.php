@@ -17,9 +17,10 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   $message .= "If you've installed ThinkTank before, you can create config file by copying or renaming ";
   $message .= "<code>config.sample.inc.php</code> to <code>config.inc.php</code>. If you want to install ";
   $message .= "ThinkTank clik on the link below to start installation.";
-  $message .= '<div id="create-config-file" class="tt-button ui-state-default ui-priority-secondary ui-corner-all">';
+  $message .= '<div class="clearfix"><div class="grid_10 prefix_8 left">';
+  $message .= '<div class="next_step tt-button ui-state-default ui-priority-secondary ui-corner-all">';
   $message .= '<a href="install/">Start Installation!</a>';
-  $message .= '</div>';
+  $message .= '</div></div></div>';
   
   $installer->diePage($message, 'Error');
 } else {

@@ -40,6 +40,7 @@ code {
 .next_step {
   width: 250px;
   margin-top: 20px;
+  font-size: 1.4em;
 }
 .next_step a {
   display: block;
