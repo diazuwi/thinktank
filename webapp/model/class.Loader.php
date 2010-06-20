@@ -1,4 +1,10 @@
 <?php
+/**
+ * Loader Model for Lazy Loading classes
+ *
+ * @author Dwi Widiastuti <admin[at]diazuwi[dot]web[dot]id>
+ *
+ */
 class Loader {
   static public $__lookupPath;
 

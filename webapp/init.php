@@ -7,7 +7,6 @@ define('THINKTANK_WEBAPP_PATH', dirname(__FILE__) . DS);
 // Define base URL, the same as $THINKTANK_CFG['site_root_path']
 define('THINKTANK_BASE_URL', substr($_SERVER['PHP_SELF'], 0, strpos( $_SERVER['PHP_SELF'], basename(__FILE__))));
 
-//require_once 'model/class.Installer.php';
 require_once 'model/class.Loader.php';
 Loader::register();
 $installer = Installer::getInstance();
@@ -42,34 +41,14 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   }
 }
 
-require_once 'model/class.Config.php';
-require_once 'model/class.Database.php';
-require_once 'model/class.MySQLDAO.php';
-require_once 'model/class.PDODAO.php';
-require_once 'model/class.DAOFactory.php';
+
 require_once 'model/class.User.php';
 require_once 'model/class.Owner.php';
 require_once 'model/class.Post.php';
 require_once 'model/class.Link.php';
-require_once 'model/class.Instance.php';
 require_once 'model/class.OwnerInstance.php';
-require_once 'model/class.PluginHook.php';
-require_once 'model/class.Crawler.php';
-require_once 'model/class.Utils.php';
-require_once 'model/class.Captcha.php';
-require_once 'model/class.Session.php';
 require_once 'model/class.Plugin.php';
-require_once 'model/class.LoggerSlowSQL.php';
-require_once 'model/interface.ThinkTankPlugin.php';
-require_once 'model/interface.CrawlerPlugin.php';
-require_once 'model/interface.WebappPlugin.php';
-require_once 'model/class.WebappTab.php';
-require_once 'model/class.WebappTabDataset.php';
-require_once 'model/class.Logger.php';
-require_once 'model/class.Follow.php';
-require_once 'model/class.Webapp.php';
-require_once 'controller/interface.Controller.php';
-require_once 'controller/class.ThinkTankController.php';
+
 require_once 'controller/class.ThinkTankAuthController.php';
 require_once 'config.inc.php';
 

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Installer Model
+ *
+ * @author Dwi Widiastuti <admin[at]diazuwi[dot]web[dot]id>
+ *
+ */
 class Installer {
 /**
  * Singleton instance of Installer

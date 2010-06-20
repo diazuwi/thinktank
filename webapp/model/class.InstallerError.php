@@ -1,4 +1,10 @@
 <?php
+/**
+ * InstallerError Model that used along with Installer Model
+ *
+ * @author Dwi Widiastuti <admin[at]diazuwi[dot]web[dot]id>
+ *
+ */
 class InstallerError extends Exception {
   function showError() {
     $title = '';
