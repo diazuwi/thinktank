@@ -41,18 +41,7 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   }
 }
 
-
-require_once 'model/class.User.php';
-require_once 'model/class.Owner.php';
-require_once 'model/class.Post.php';
-require_once 'model/class.Link.php';
-require_once 'model/class.OwnerInstance.php';
-require_once 'model/class.Plugin.php';
-
 $config = Config::getInstance();
-require_once $config->getValue('smarty_path').'Smarty.class.php';
-
-require_once 'model/class.SmartyThinkTank.php';
 require_once $config->getValue('source_root_path').'extlib/twitteroauth/twitteroauth.php';
 
 if ($config->getValue('time_zone')) {
