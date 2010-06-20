@@ -49,9 +49,6 @@ require_once 'model/class.Link.php';
 require_once 'model/class.OwnerInstance.php';
 require_once 'model/class.Plugin.php';
 
-require_once 'controller/class.ThinkTankAuthController.php';
-require_once 'config.inc.php';
-
 $config = Config::getInstance();
 require_once $config->getValue('smarty_path').'Smarty.class.php';
 
