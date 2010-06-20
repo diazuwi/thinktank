@@ -1076,6 +1076,13 @@ class Installer {
   private function __step3() {
     $config_file_exists = false;
     $config_file = THINKTANK_WEBAPP_PATH . 'config.inc.php';
+    
+    // make sure we are here with posted data
+    if ( empty($_POST) ) {
+      header('Location: index.php?step=2');
+      die;
+    }
+    
     // check if we have made config.inc.php
     if ( file_exists($config_file) ) {
       // this is could be from step 2 is not able writing
