@@ -7,7 +7,9 @@ define('THINKTANK_WEBAPP_PATH', dirname(__FILE__) . DS);
 // Define base URL, the same as $THINKTANK_CFG['site_root_path']
 define('THINKTANK_BASE_URL', substr($_SERVER['PHP_SELF'], 0, strpos( $_SERVER['PHP_SELF'], basename(__FILE__))));
 
-require_once 'model/class.Installer.php';
+//require_once 'model/class.Installer.php';
+require_once 'model/class.Loader.php';
+Loader::register();
 $installer = Installer::getInstance();
 if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   // if config file doesn't exist
