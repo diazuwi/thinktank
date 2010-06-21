@@ -105,8 +105,11 @@ class Installer {
       }
       Loader::register();
       
-      // instantiate SmartyInstaller
-      self::$__view = new SmartyThinkTank(true);
+      // instantiate Smarty
+      self::$__view = new Smarty();
+      self::$__view->template_dir = array(THINKTANK_WEBAPP_PATH . 'view');
+      self::$__view->compile_dir = THINKTANK_WEBAPP_PATH . 'view' . DS . 'compiled_view' . DS;
+      self::$__view->caching = FALSE;
       self::$__view->assign('base_url', THINKTANK_BASE_URL);
       self::$__view->assign('favicon', THINKTANK_BASE_URL . 'assets/img/favicon.ico');
       

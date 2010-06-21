@@ -21,6 +21,8 @@ class Loader {
  * The value will be assigned inside __setLookupPath method.
  */  
   static private $__specialClasses;
+  
+  static private $__installer;
 
 /**
  * Register current script to use lazy loading classes
@@ -125,9 +127,47 @@ class Loader {
     }
     
     // if config class, also include the config.inc.php
-    if ( $class == 'Config' ) {
+    if ( $class == 'Config' && !class_exists('Config') ) {
       global $THINKTANK_CFG;
-      require_once THINKTANK_WEBAPP_PATH . 'config.inc.php';
+      
+      if ( is_null(self::$__installer) ) {
+        require_once THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Installer.php';
+        self::$__installer = Installer::getInstance();
+      }
+      if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
+        // if config file doesn't exist
+        
+        $message  = "<p>Config's file, <code>config.inc.php</code>, is not found! ";
+        $message .= "No need to worry, this may happens if you're going install ThinkTank for the first time. ";
+        $message .= "If you've installed ThinkTank before, you can create config file by copying or renaming ";
+        $message .= "<code>config.sample.inc.php</code> to <code>config.inc.php</code>. If you want to install ";
+        $message .= "ThinkTank clik on the link below to start installation.";
+        $message .= '<div class="clearfix"><div class="grid_10 prefix_8 left">';
+        $message .= '<div class="next_step tt-button ui-state-default ui-priority-secondary ui-corner-all">';
+        $message .= '<a href="' . THINKTANK_BASE_URL . 'install/">Start Installation!</a>';
+        $message .= '</div></div></div>';
+        
+        self::$__installer->diePage($message, 'Error');
+      } else {
+        // config file exists in THINKTANK_WEBAPP_PATH
+        require_once THINKTANK_WEBAPP_PATH . 'config.inc.php';
+        require_once THINKTANK_WEBAPP_PATH . '/model/class.Config.php';
+        $config = Config::getInstance();
+        
+        try {
+          // check if $THINKTANK_CFG related to path exists
+          self::$__installer->checkPath($config->config);
+          
+          // check if ThinkTank is installed
+          if ( !self::$__installer->isThinkTankInstalled($config->config) ) {
+            throw new InstallerError('', Installer::ERROR_INSTALL_NOT_COMPLETE);
+          }
+        } catch (InstallerError $e) {
+          $e->showError();
+        }
+      }
+      
+      return;
     }
     
     // regular class convention filename
