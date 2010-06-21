@@ -120,8 +120,14 @@ class Loader {
     
     // if $class is interface or special class filename
     if ( array_key_exists($class, self::$__specialClasses) ) {
-      require self::$__specialClasses[$class];
+      require_once self::$__specialClasses[$class];
       return;
+    }
+    
+    // if config class, also include the config.inc.php
+    if ( $class == 'Config' ) {
+      global $THINKTANK_CFG;
+      require_once THINKTANK_WEBAPP_PATH . 'config.inc.php';
     }
     
     // regular class convention filename

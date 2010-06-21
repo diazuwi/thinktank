@@ -106,7 +106,7 @@ class Installer {
       Loader::register();
       
       // instantiate SmartyInstaller
-      self::$__view = new SmartyInstaller();
+      self::$__view = new SmartyThinkTank(true);
       self::$__view->assign('base_url', THINKTANK_BASE_URL);
       self::$__view->assign('favicon', THINKTANK_BASE_URL . 'assets/img/favicon.ico');
       

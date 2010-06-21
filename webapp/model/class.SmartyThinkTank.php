@@ -31,19 +31,30 @@ class SmartyThinkTank extends Smarty {
      *  //application name
      *  {$app_name}
      *  </code>
-     *
+     *  
+     * @param bool $override_cache_setting Set to true if we don't want caching
      */
-    public function __construct() {
+    public function __construct($override_cache_setting = false) {
         $config = Config::getInstance();
         $src_root_path = $config->getValue('source_root_path');
+        
+        if ( empty($src_root_path) && defined('THINKTANK_ROOT_PATH') ) {
+          $src_root_path = THINKTANK_ROOT_PATH;
+        }
+        
         $this->Smarty();
         $this->template_dir = array( $src_root_path.'webapp/view', $src_root_path.'tests/view');
         $this->compile_dir = $src_root_path.'webapp/view/compiled_view/';
         $this->plugins_dir = array('plugins', 'view/plugins/');
-        $this->cache_dir = $src_root_path.'webapp/view/compiled_view/cache';
-        $this->cache_lifetime = 300;
-        $this->caching = $config->getValue('cache_pages');
-        $this->debug = $config->getValue('debug');
+        
+        if ( $override_cache_setting ) {
+          $this->caching = FALSE;
+        } else {
+          $this->cache_dir = $src_root_path.'webapp/view/compiled_view/cache';
+          $this->cache_lifetime = 300;
+          $this->caching = $config->getValue('cache_pages');
+          $this->debug = $config->getValue('debug');
+        }
 
         $this->assign('app_title', $config->getValue('app_title'));
         $this->assign('site_root_path', $config->getValue('site_root_path'));

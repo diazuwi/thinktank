@@ -6,7 +6,7 @@ define('THINKTANK_ROOT_PATH', dirname(dirname(__FILE__)) . DS);
 define('THINKTANK_WEBAPP_PATH', dirname(__FILE__) . DS);
 // Define base URL, the same as $THINKTANK_CFG['site_root_path']
 define('THINKTANK_BASE_URL', substr($_SERVER['PHP_SELF'], 0, strpos( $_SERVER['PHP_SELF'], basename(__FILE__))));
-
+echo THINKTANK_BASE_URL;
 require_once 'model/class.Loader.php';
 Loader::register();
 $installer = Installer::getInstance();
@@ -26,14 +26,14 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   $installer->diePage($message, 'Error');
 } else {
   // config file exists in THINKTANK_WEBAPP_PATH
-  require_once 'config.inc.php';
+  $config = Config::getInstance();
   
   try {
     // check if $THINKTANK_CFG related to path exists
-    $installer->checkPath($THINKTANK_CFG);
+    $installer->checkPath($config->config);
     
     // check if ThinkTank is installed
-    if ( !$installer->isThinkTankInstalled($THINKTANK_CFG) ) {
+    if ( !$installer->isThinkTankInstalled($config->config) ) {
       throw new InstallerError('', Installer::ERROR_INSTALL_NOT_COMPLETE);
     }
   } catch (InstallerError $e) {
@@ -41,7 +41,6 @@ if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
   }
 }
 
-$config = Config::getInstance();
 require_once $config->getValue('source_root_path').'extlib/twitteroauth/twitteroauth.php';
 
 if ($config->getValue('time_zone')) {
