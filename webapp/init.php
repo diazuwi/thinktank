@@ -13,10 +13,7 @@ array_pop($current_script_path);
 if ( in_array($current_script_path[count($current_script_path)-1], array('account', 'post', 'session', 'user')) ) {
   array_pop($current_script_path);
 }
-$current_script_path = implode('/', $current_script_path);
-if ( empty($current_script_path) ) {
-  $current_script_path = '/';
-}
+$current_script_path = implode('/', $current_script_path) . '/';
 define('THINKTANK_BASE_URL', $current_script_path);
 
 require_once 'model/class.Loader.php';
