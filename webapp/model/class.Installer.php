@@ -949,6 +949,14 @@ class Installer {
       $site_name    = $THINKTANK_CFG['app_title'];
       $country      = trim($_POST['country']);
     } else {
+      // make sure we're not from error of couldn't write config.inc.php
+      if ( !isset($_POST['db_user']) && !isset($_POST['db_passwd']) &&
+           !isset($_POST['db_name']) && !isset($_POST['db_host']) ) {
+        
+        header('Location: index.php?step=2');
+        die;
+      }
+      
       // trim each posted value
       $db_config['db_name']   = trim($_POST['db_name']);
       $db_config['db_user']   = trim($_POST['db_user']);
