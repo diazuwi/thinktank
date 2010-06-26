@@ -105,6 +105,24 @@ class Loader {
     
     return true;
   }
+
+/**
+ * Get lookup path
+ * @return array of lookup path
+ * @access public
+ */  
+  public function getLookupPath() {
+    return self::$__lookupPath;
+  }
+
+/**
+ * Get special classes files
+ * @return array of special classes path files
+ * @access public
+ */
+  public function getSpecialClasses() {
+    return self::$__specialClasses;
+  }
  
  /**
   * A method that registered to spl_autoload_register. When a class
