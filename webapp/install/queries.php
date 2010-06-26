@@ -10,6 +10,7 @@ CREATE TABLE {$table['follows']} (
   last_seen timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   active int(11) NOT NULL DEFAULT '1',
   network varchar(10) NOT NULL DEFAULT 'twitter',
+  debug_api_call varchar(255) NOT NULL,
   PRIMARY KEY  (user_id,follower_id),
   KEY active (active)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -55,9 +56,9 @@ CREATE TABLE {$table['owner_instances']} (
   id int(20) NOT NULL AUTO_INCREMENT,
   owner_id int(10) NOT NULL,
   instance_id int(10) NOT NULL,
-  oauth_access_token varchar(255) NOT NULL DEFAULT '',
+  oauth_access_token varchar(255) DEFAULT NULL,
   oauth_access_token_secret varchar(255) DEFAULT NULL,
-  PRIMARY KEY  (id)
+  PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 CREATE TABLE {$table['owners']} (
   id int(20) NOT NULL AUTO_INCREMENT,
@@ -110,21 +111,27 @@ CREATE TABLE {$table['posts']} (
   author_avatar varchar(255) NOT NULL,
   post_text varchar(255) NOT NULL,
   source varchar(255) DEFAULT NULL,
+  location varchar(255) DEFAULT NULL,
+  place varchar(255) DEFAULT NULL,
+  geo varchar(255) DEFAULT NULL,
   pub_date timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   in_reply_to_user_id int(11) DEFAULT NULL,
   in_reply_to_post_id bigint(11) DEFAULT NULL,
-  mention_count_cache int(11) NOT NULL DEFAULT '0',
+  reply_count_cache int(11) NOT NULL DEFAULT '0',
+  is_reply_by_friend tinyint(4) NOT NULL DEFAULT '0',
   in_retweet_of_post_id bigint(11) DEFAULT NULL,
   retweet_count_cache int(11) NOT NULL DEFAULT '0',
+  is_retweet_by_friend tinyint(4) NOT NULL DEFAULT '0',
   network varchar(10) NOT NULL DEFAULT 'twitter',
-  PRIMARY KEY  (id),
+  is_geo_encoded int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
   UNIQUE KEY status_id (post_id),
   KEY author_username (author_username),
   KEY pub_date (pub_date),
   KEY author_user_id (author_user_id),
   KEY in_retweet_of_status_id (in_retweet_of_post_id),
   KEY in_reply_to_user_id (in_reply_to_user_id),
-  FULLTEXT KEY tweets_fulltext (post_text)
+  FULLTEXT KEY tweets_fulltext (post_text)  
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 CREATE TABLE {$table['user_errors']} (
   id int(11) NOT NULL AUTO_INCREMENT,
