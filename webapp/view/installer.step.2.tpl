@@ -78,6 +78,26 @@
           
           <div class="clearfix append_20">
             <div class="grid_5 prefix_3 right">
+              <label>Database Socket</label>
+            </div>
+            <div class="grid_10 prefix_1 left">
+              <input type="text" name="db_socket" id="db_socket"{if isset($db_socket)} value="{$db_socket}"{/if}>
+              <span class="input_information">Leave it blanks if you're not sure about this.</span>
+            </div>
+          </div>
+          
+          <div class="clearfix append_20">
+            <div class="grid_5 prefix_3 right">
+              <label>Database Port</label>
+            </div>
+            <div class="grid_10 prefix_1 left">
+              <input type="text" name="db_port" id="db_port"{if isset($db_port)} value="{$db_port}"{/if}>
+              <span class="input_information">Leave it blanks if you're not sure about this.</span>
+            </div>
+          </div>
+          
+          <div class="clearfix append_20">
+            <div class="grid_5 prefix_3 right">
               <label>Table Prefix</label>
             </div>
             <div class="grid_10 prefix_1 left">

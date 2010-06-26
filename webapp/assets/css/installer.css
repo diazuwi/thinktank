@@ -52,7 +52,7 @@ span.label, span.value {
   color: red;
 }
 .value.yes {
-  color: #0060E0;
+  color: green;
   background: url(../img/yes.png) no-repeat 0 50%;
   display: block;
   min-height: 32px;

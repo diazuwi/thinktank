@@ -912,6 +912,8 @@ class Installer {
     self::$__view->assign('db_passwd', 'password');
     self::$__view->assign('db_host', 'localhost');
     self::$__view->assign('db_prefix', 'tt_');
+    self::$__view->assign('db_socket', '');
+    self::$__view->assign('db_port', '');
     self::$__view->assign('site_name', 'My ThinkTank');
     self::$__view->assign('owner_name', 'Your Name');
     self::$__view->assign('site_email', 'username@example.com');
@@ -943,6 +945,8 @@ class Installer {
       $db_config['db_user']   = $THINKTANK_CFG['db_user'];
       $db_config['db_password'] = $THINKTANK_CFG['db_password'];
       $db_config['db_host']   = $THINKTANK_CFG['db_host'];
+      $db_config['db_socket']   = $THINKTANK_CFG['db_socket'];
+      $db_config['db_port']   = $THINKTANK_CFG['db_port'];
       $db_config['table_prefix'] = $THINKTANK_CFG['table_prefix'];
       $site_email   = trim($_POST['site_email']);
       $owner_name   = trim($_POST['owner_name']);
@@ -962,6 +966,8 @@ class Installer {
       $db_config['db_user']   = trim($_POST['db_user']);
       $db_config['db_password'] = trim($_POST['db_passwd']);
       $db_config['db_host']   = trim($_POST['db_host']);
+      $db_config['db_socket']   = trim($_POST['db_socket']);
+      $db_config['db_port']   = trim($_POST['db_port']);
       $db_config['table_prefix'] = trim($_POST['db_prefix']);
       $site_email   = trim($_POST['site_email']);
       $owner_name   = trim($_POST['owner_name']);
@@ -1051,11 +1057,16 @@ class Installer {
               "'your_thinktank_database_name'", "'" . $db_config['db_name'] . "'", $line
             );
             break;
-          case "['db_socket']                   ": // TODO: remove this when PDODAO consistent with host and port
+          case "['db_socket']                 ":
             $sample_config[$line_num] = str_replace(
-              "'/tmp/mysql.sock'", "''", $line
+              "= '';", "= '" . $db_config['db_socket'] . "';", $line
             );
             break;
+          case "['db_port']                   ":
+            $sample_config[$line_num] = str_replace(
+              "= '';", "= '" . $db_config['db_port'] . "';", $line
+            );
+            break; 
           case "['table_prefix']              ":
             $sample_config[$line_num] = str_replace(
               "'tt_'", "'" . $db_config['table_prefix'] . "'", $line
