@@ -1088,7 +1088,7 @@ class Installer {
         $message .= "<p>After you've done that, click the Next Step &raquo;</p>";
         
         // hidden form
-        $message .= '<form name="form1" method="post" action="index.php?step=3">';
+        $message .= '<form name="form1" class="input" method="post" action="index.php?step=3">';
         $message .= '<input type="hidden" name="owner_name" value="'.$owner_name.'">';
         $message .= '<input type="hidden" name="site_email" value="'.$site_email.'">';
         $message .= '<input type="hidden" name="country" value="'.$country.'">';
