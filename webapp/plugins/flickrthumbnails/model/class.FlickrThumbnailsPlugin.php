@@ -2,16 +2,13 @@
 class FlickrThumbnailsPlugin implements CrawlerPlugin {
 
     function crawl() {
-        global $db;
-        global $conn;
-
         $config = Config::getInstance();
         $api_key = $config->getValue('flickr_api_key');
 
         if (isset($api_key) && $api_key != '') {
             $logger = Logger::getInstance();
             $fa = new FlickrAPIAccessor($api_key);
-            $ldao = new LinkDAO($db, $logger);
+            $ldao = DAOFactory::getDAO('LinkDAO');
 
             $flickrlinkstoexpand = $ldao->getLinksToExpandByURL('http://flic.kr/');
             if (count($flickrlinkstoexpand > 0)) {
@@ -32,8 +29,7 @@ class FlickrThumbnailsPlugin implements CrawlerPlugin {
         }
     }
 
-    function renderConfiguration() {
+    function renderConfiguration($owner) {
         // TODO Add setting for the Flickr API key here
     }
 }
-?>

@@ -31,14 +31,15 @@ class Config {
     var $config;
     /**
      * Constructor
+     * @return Config
      */
-    function __construct() {
+    public function __construct() {
         global $THINKTANK_CFG;
         $this->config = $THINKTANK_CFG;
     }
 
     /**
-     * get the singleton instance of Config
+     * Get the singleton instance of Config
      * @return Config
      */
     public static function getInstance() {
@@ -49,7 +50,7 @@ class Config {
     }
 
     /**
-     * get the configuration value
+     * Get the configuration value
      * @param    string   $key   key of the configuration key/value pair
      * @return   mixed    value of the configuration key/value pair
      */
@@ -59,7 +60,7 @@ class Config {
     }
 
     /**
-     * provided only for use when overriding config.inc.php values in tests
+     * Provided only for use when overriding config.inc.php values in tests
      * @param string $key
      * @param string $value
      * @return string $value
@@ -70,7 +71,7 @@ class Config {
     }
 
     /**
-     * provided only for tests that want to kill Config object in tearDown()
+     * Provided only for tests that want to kill Config object in tearDown()
      */
     public static function destroyInstance() {
         if (isset(self::$instance)) {

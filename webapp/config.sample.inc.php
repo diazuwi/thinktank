@@ -41,6 +41,8 @@ $THINKTANK_CFG['is_registration_open']      = true;
 
 $THINKTANK_CFG['debug']                     = true;
 
+$THINKTANK_CFG['enable_profiler']           = false;
+
 /************************************************/
 /***  DATABASE CONFIG                         ***/
 /************************************************/
@@ -50,7 +52,8 @@ $THINKTANK_CFG['db_type']                   = 'mysql';
 $THINKTANK_CFG['db_user']                   = 'your_database_username';
 $THINKTANK_CFG['db_password']               = 'your_database_password';
 $THINKTANK_CFG['db_name']                   = 'your_thinktank_database_name';
-$THINKTANK_CFG['db_socket']                 = '/tmp/mysql.sock';
+$THINKTANK_CFG['db_socket']                 = '';
+$THINKTANK_CFG['db_port']                   = '';
 $THINKTANK_CFG['table_prefix']              = 'tt_';
 
 

@@ -10,25 +10,17 @@ require_once $SOURCE_ROOT_PATH.'webapp/model/class.LoggerSlowSQL.php';
 require_once $SOURCE_ROOT_PATH.'webapp/config.inc.php';
 
 
-class TestOfLogging extends ThinkTankBasicUnitTestCase {
-    function TestOfLogging() {
-        $this->UnitTestCase('Log class test');
+class TestOfLogger extends ThinkTankBasicUnitTestCase {
+    function __construct() {
+        $this->UnitTestCase('Logger class test');
     }
 
     function setUp() {
-        global $THINKTANK_CFG;
-        // delete our log file if it exists
-        if (file_exists($THINKTANK_CFG['log_location'])) {
-            unlink($THINKTANK_CFG['log_location']);
-        }
+        parent::setUp();
     }
 
     function tearDown() {
-        global $THINKTANK_CFG;
-        // delete our log file if it exists
-        if (file_exists($THINKTANK_CFG['log_location'])) {
-            unlink($THINKTANK_CFG['log_location']);
-        }
+        parent::tearDown();
     }
 
     function testNewLoggerSingleton() {
@@ -41,8 +33,7 @@ class TestOfLogging extends ThinkTankBasicUnitTestCase {
         $this->assertWantedPattern('/Singleton logger should write this to the log/', $messages[sizeof($messages) - 1]);
         $logger->setUsername('single-ton');
         $logger->logStatus('Should write this to the log with a username', get_class($this));
-        $this->assertWantedPattern('/single-ton | TestOfLogging:Singleton logger should write this to the log/', $messages[sizeof($messages) - 1]);
+        $this->assertWantedPattern('/single-ton | TestOfLogger:Singleton logger should write this to the log/', $messages[sizeof($messages) - 1]);
         $logger->close();
     }
 }
-?>

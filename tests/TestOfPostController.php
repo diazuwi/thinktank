@@ -40,7 +40,9 @@ class TestOfPostController extends ThinkTankUnitTestCase {
      */
     function setUp(){
         parent::setUp();
-        $q = "INSERT INTO tt_posts (post_id, author_user_id, author_username, author_fullname, author_avatar, post_text, source, pub_date, mention_count_cache, retweet_count_cache) VALUES (1001, 13, 'ev', 'Ev Williams', 'avatar.jpg', 'This is a test post', 'web', '2006-01-01 00:05:00', ".rand(0, 4).", 5);";
+        $q = "INSERT INTO tt_posts (post_id, author_user_id, author_username, author_fullname, author_avatar, 
+        post_text, source, pub_date, reply_count_cache, retweet_count_cache) VALUES (1001, 13, 'ev', 'Ev Williams', 
+        'avatar.jpg', 'This is a test post', 'web', '2006-01-01 00:05:00', ".rand(0, 4).", 5);";
         $this->db->exec($q);
     }
 
@@ -79,7 +81,7 @@ class TestOfPostController extends ThinkTankUnitTestCase {
      */
     function testControlLoggedInWithPostID() {
         $_SESSION['user'] = 'me@example.com';
-        $_REQUEST["t"] = '1001';
+        $_GET["t"] = '1001';
 
         $controller = new PostController(true);
         $results = $controller->go();
@@ -92,7 +94,7 @@ class TestOfPostController extends ThinkTankUnitTestCase {
      */
     function testControlLoggedInWithNumericButNonExistentPostID(){
         $_SESSION['user'] = 'me@example.com';
-        $_REQUEST["t"] = '11';
+        $_GET["t"] = '11';
 
         $controller = new PostController(true);
         $results = $controller->go();
@@ -105,7 +107,7 @@ class TestOfPostController extends ThinkTankUnitTestCase {
      */
     function testControlLoggedInWithNonNumericPostID(){
         $_SESSION['user'] = 'me@example.com';
-        $_REQUEST["t"] = 'notapostID45';
+        $_GET["t"] = 'notapostID45';
 
         $controller = new PostController(true);
         $results = $controller->go();

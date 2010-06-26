@@ -1,38 +1,84 @@
 <?php
 /**
-* DAOFactory
-* 
-* inits a dao based on the think tank config db_type and $dao_mapping definitions.
-
-* db_type is defined in webapp/config.inc.php as:
-* 
-*     $THINKTANK_CFG['db_type'] = 'somedb';
-* 
-* Example: DAOFactory::getDAO('SomeDAO');
-* 
-* @author Mark Wilkie
-*/
+ * Data Access Object Factory
+ *
+ * Inits a DAO based on the ThinkTank config db_type and $dao_mapping definitions.
+ * db_type is defined in webapp/config.inc.php as:
+ *
+ *     $THINKTANK_CFG['db_type'] = 'somedb';
+ *
+ * Example of use:
+ *
+ * <code>
+ *  DAOFactory::getDAO('SomeDAO');
+ * </code>
+ *
+ * @author Mark Wilkie
+ */
 class DAOFactory {
 
     /**
      * maps DAO from db_type and defines class names and path for initialization
      */
     static $dao_mapping = array (
-        // our test dao
+        //Test DAO
         'TestDAO' => array( 
+            //MySQL Version
             'mysql' => array( 'class' => 'TestMysqlDAO', 'path' =>  'tests/classes/class.TestMysqlDAO.php'),
+            //faux Version
             'faux' => array( 'class' => 'TestFauxDAO', 'path' =>  'tests/classes/class.TestFauxDAO.php'),
         ),
-        //Instance MySQL DAO
+        //Instance DAO
         'InstanceDAO' => array(
+            //MySQL Version
             'mysql' => array( 'class' => 'InstanceMySQLDAO', 'path' => 'model/class.InstanceMySQLDAO.php')
+        ),
+        //Follow DAO
+        'FollowDAO' => array(
+            //MySQL Version
+            'mysql' => array( 'class' => 'FollowMySQLDAO', 'path' => 'model/class.FollowMySQLDAO.php')
+        ),
+        //Post Error DAO
+        'PostErrorDAO' => array(
+            //MySQL Version
+            'mysql' => array( 'class' => 'PostErrorMySQLDAO', 'path' => 'model/class.PostErrorMySQLDAO.php')
+        ),
+        //Post DAO
+        'PostDAO' => array(
+            //MySQL Version
+            'mysql' => array( 'class' => 'PostMySQLDAO', 'path' => 'model/class.PostMySQLDAO.php')
+        ),
+        //User DAO
+        'UserDAO' => array(
+            //MySQL Version
+            'mysql' => array( 'class' => 'UserMySQLDAO', 'path' => 'model/class.UserMySQLDAO.php')
+        ),
+        //UserError DAO
+        'UserErrorDAO' => array(
+            //MySQL Version
+            'mysql' => array( 'class' => 'UserErrorMySQLDAO', 'path' => 'model/class.UserErrorMySQLDAO.php')
+        ),
+        //Link DAO
+        'LinkDAO' => array(
+            //MySQL Version
+            'mysql' => array( 'class' => 'LinkMySQLDAO', 'path' => 'model/class.LinkMySQLDAO.php')
+        ),
+        //Owner MySQL DAO
+        'OwnerDAO' => array(
+            //MySQL Version
+            'mysql' => array( 'class' => 'OwnerMySQLDAO', 'path' => 'model/class.OwnerMySQLDAO.php')
+        ),
+        //OwnerInstance MySQL DAO
+        'OwnerInstanceDAO' => array(
+            //MySQL Version
+            'mysql' => array( 'class' => 'OwnerInstanceMySQLDAO', 'path' => 'model/class.OwnerInstanceMySQLDAO.php')
         )
     );
 
     /*
-     *  Creates a DAO instance and returns it
+     * Creates a DAO instance and returns it
      *
-     * @param string - the name of the dao you wish to init
+     * @param string $dao_key the name of the dao you wish to init
      * @returns object - a concrete dao instance
      */
     public static function getDAO($dao_key) {
@@ -50,11 +96,13 @@ class DAOFactory {
     }
 
     /**
-     * gets the db_type for our configured ThinkTank instance, defaults to mysql,
+     * Gets the db_type for our configured ThinkTank instance, defaults to mysql,
      * db_type can optionally be defined in webapp/config.inc.php as:
-     * 
+     *
+     *<code>
      *     $THINKTANK_CFG['db_type'] = 'somedb';
-     * 
+     *</code>
+     *
      * @return string db_type, will default to 'mysql' if not defined
      */
     public static function getDBType() {
@@ -63,4 +111,3 @@ class DAOFactory {
         return $type;
     }
 }
-?>

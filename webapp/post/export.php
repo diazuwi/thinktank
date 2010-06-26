@@ -8,15 +8,15 @@ chdir("..");
 
 require_once 'init.php';
 
-$od = new OwnerDAO($db);
+$od = DAOFactory::getDAO('OwnerDAO');
 $owner = $od->getByEmail($_SESSION['user']);
 
-$pd = new PostDAO($db);
+$pd = DAOFactory::getDAO('PostDAO');
 $id = DAOFactory::getDAO('InstanceDAO');
 
 if ( isset($_REQUEST['u']) && $id->isUserConfigured($_REQUEST['u']) ){
     $username = $_REQUEST['u'];
-    $oid = new OwnerInstanceDAO($db);
+    $oid = DAOFactory::getDAO('OwnerInstanceDAO');
     if ( !$oid->doesOwnerHaveAccess($owner, $username) ) {
         echo 'Insufficient privileges. <a href="/">Back</a>.';
         die;

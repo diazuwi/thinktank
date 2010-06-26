@@ -38,10 +38,10 @@ if (isset($_GET['sessionKey']) && isset($fb_user) && $fb_user > 0) {
     echo "DEBUG:";
     echo "Session Key: ".$session_key."<br />";
 
-    $od = new OwnerDAO($db);
+    $od = DAOFactory::getDAO('OwnerDAO');
     $id = DAOFactory::getDAO('InstanceDAO');
-    $oid = new OwnerInstanceDAO($db);
-    $ud = new UserDAO($db);
+    $oid = DAOFactory::getDAO('OwnerInstanceDAO');
+    $ud = DAOFactory::getDAO('UserDAO');
 
 
     $owner = $od->getByEmail($_SESSION['user']);

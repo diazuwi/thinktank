@@ -9,11 +9,11 @@ chdir("..");
 
 require_once 'init.php';
 
-$od = new OwnerDAO($db);
-$ud = new UserDAO($db);
-$fd = new FollowDAO($db);
+$od = DAOFactory::getDAO('OwnerDAO');
+$ud = DAOFactory::getDAO('UserDAO');
+$fd = DAOFactory::getDAO('FollowDAO');
 $id = DAOFactory::getDAO('InstanceDAO');
-$pd = new PostDAO($db);
+$pd = DAOFactory::getDAO('PostDAO');
 $s = new SmartyThinkTank();
 
 if ( isset($_REQUEST['u']) && $ud->isUserInDBByName($_REQUEST['u']) && isset($_REQUEST['i']) ){
@@ -37,7 +37,7 @@ if ( isset($_REQUEST['u']) && $ud->isUserInDBByName($_REQUEST['u']) && isset($_R
             $s->assign('exchanges', $exchanges);
             $s->assign('total_exchanges', count($exchanges));
 
-            $mutual_friends = $fd->getMutualFriends($user->user_id, $i->network_user_id);
+            $mutual_friends = $fd->getMutualFriends($user->user_id, $i->network_user_id, $i->network);
             $s->assign('mutual_friends', $mutual_friends);
             $s->assign('total_mutual_friends', count($mutual_friends) );
         }

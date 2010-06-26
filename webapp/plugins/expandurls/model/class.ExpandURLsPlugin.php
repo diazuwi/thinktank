@@ -1,10 +1,8 @@
 <?php
 class ExpandURLsPlugin implements CrawlerPlugin {
     public function crawl() {
-        global $db;
-
         $logger = Logger::getInstance();
-        $ldao = new LinkDAO($db, $logger);
+        $ldao = DAOFactory::getDAO('LinkDAO');
         //TODO Set limit on total number of links to expand per crawler run in the plugin settings, now set here to 1500
         $linkstoexpand = $ldao->getLinksToExpand(1500);
 
@@ -20,7 +18,8 @@ class ExpandURLsPlugin implements CrawlerPlugin {
         $logger->close(); # Close logging
     }
 
-    public function renderConfiguration() {
+    public function renderConfiguration($owner) {
+        //TODO: Write controller class, echo its results
 
     }
 

@@ -6,14 +6,17 @@
     <div class="grid_7">post</div>
     <div class="grid_2">{if $sort eq 'no'}&#160;{else}<a href="{$site_root_path}public.php?v=photos">w/ photos</a>{/if}</div>
     <div class="grid_2">{if $sort eq 'no'}&#160;{else}<a href="{$site_root_path}public.php?v=links">w/ links</a>{/if}</div>
-    <div class="grid_2 center">{if $sort eq 'no'}replies{else}<a href="{$site_root_path}public.php?v=mostreplies">replies</a>{/if}</div>
-    <div class="grid_2 center omega">{if $sort eq 'no'}forwards{else}<a href="{$site_root_path}public.php?v=mostretweets">forwards</a>{/if}</div>
+    <div class="grid_2 center">{if $sort eq 'no'}replies{else}<a href="{$site_root_path}public.php?v=mostreplies">replies</a>{/if} {if $sort neq 'no'}(<a href="{$site_root_path}public.php?v=mostreplies1wk">7d</a>){/if}</div>
+    <div class="grid_2 center omega">{if $sort eq 'no'}forwards{else}<a href="{$site_root_path}public.php?v=mostretweets">fwds</a> {/if}{if $sort neq 'no'}(<a href="{$site_root_path}public.php?v=mostretweets1wk">7d</a>){/if}</div>
   </div>
 {/if}
 
 <div class="individual-tweet post clearfix">
   <div class="grid_1 alpha">
     <img src="{$t->author_avatar}" class="avatar">
+    {if $t->is_reply_by_friend or $t->is_retweet_by_friend}
+       <div class="small gray">Friend</div>
+    {/if}
   </div>
   <div class="grid_3 right small">
     {if $t->network == 'twitter'}
@@ -51,8 +54,8 @@
     {/if}
   </div>
   <div class="grid_2 center">
-    {if $t->mention_count_cache > 0}
-      <span class="reply-count"><a href="{$site_root}public.php?t={$t->post_id}">{$t->mention_count_cache}<!-- repl{if $t->mention_count_cache eq 1}y{else}ies{/if}--></a></span>
+    {if $t->reply_count_cache > 0}
+      <span class="reply-count"><a href="{$site_root}public.php?t={$t->post_id}">{$t->reply_count_cache}<!-- repl{if $t->reply_count_cache eq 1}y{else}ies{/if}--></a></span>
     {else}
       &#160;
     {/if}

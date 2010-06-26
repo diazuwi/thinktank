@@ -8,9 +8,17 @@ require_once $SOURCE_ROOT_PATH.'webapp/model/class.Config.php';
 require_once $SOURCE_ROOT_PATH.'tests/classes/class.ThinkTankUnitTestCase.php';
 // require_once $SOURCE_ROOT_PATH.'tests/classes/class.TestDAO.php';
 require_once $SOURCE_ROOT_PATH.'webapp/model/class.DAOFactory.php';
+
+/**
+ * Test of DAOFactory
+ *
+ * @author Mark Wilkie
+ * @author Gina Trapani <ginatrapani[at]gmail[dot]com>
+ *
+ */
 class TestOfDAOFactory extends ThinkTankUnitTestCase {
 
-    function TestOfDAOFactory() {
+    function __construct() {
         $this->UnitTestCase('DAOFactory test');
     }
 
@@ -75,7 +83,7 @@ class TestOfDAOFactory extends ThinkTankUnitTestCase {
         // valid mysql test dao
         Config::getInstance()->setValue('db_type', 'mysql');
         $test_dao = DAOFactory::getDAO('TestDAO');
-        $this->assertEqual(get_class($test_dao), 'TestMysqlDAO', 'we are a mysql dao');
+        $this->assertIsA($test_dao, 'TestMysqlDAO', 'we are a mysql dao');
         $data_obj = $test_dao->selectRecord(1);
         $this->assertNotNull($data_obj);
         $this->assertEqual($data_obj->test_name, 'name1');
@@ -84,12 +92,90 @@ class TestOfDAOFactory extends ThinkTankUnitTestCase {
         // valid fuax test dao
         Config::getInstance()->setValue('db_type', 'faux');
         $test_dao = DAOFactory::getDAO('TestDAO');
-        $this->assertEqual(get_class($test_dao), 'TestFauxDAO', 'we are a mysql dao');
+        $this->assertIsA($test_dao, 'TestFauxDAO', 'we are a mysql dao');
         $data_obj = $test_dao->selectRecord(1);
         $this->assertNotNull($data_obj);
         $this->assertEqual($data_obj->test_name, 'Mojo Jojo');
         $this->assertEqual($data_obj->test_id, 2001);
 
     }
+    /**
+     * Test get InstanceDAO
+     */
+    function testGetInstanceDAO(){
+        $dao = DAOFactory::getDAO('InstanceDAO');
+        $this->assertTrue(isset($dao));
+        $this->assertIsA($dao, 'InstanceMySQLDAO');
+    }
 
+    /**
+     * Test get FollowDAO
+     */
+    function testGetFollowDAO(){
+        $dao = DAOFactory::getDAO('FollowDAO');
+        $this->assertTrue(isset($dao));
+        $this->assertIsA($dao, 'FollowMySQLDAO');
+    }
+
+    /**
+     * Test get PostErrorDAO
+     */
+    function testGetPostErrorDAO(){
+        $dao = DAOFactory::getDAO('PostErrorDAO');
+        $this->assertTrue(isset($dao));
+        $this->assertIsA($dao, 'PostErrorMySQLDAO');
+    }
+    /**
+     * Test get PostDAO
+     */
+    function testGetPostDAO(){
+        $dao = DAOFactory::getDAO('PostDAO');
+        $this->assertTrue(isset($dao));
+        $this->assertIsA($dao, 'PostMySQLDAO');
+    }
+
+    /**
+     * Test get UserDAO
+     */
+    function testGetUserDAO(){
+        $dao = DAOFactory::getDAO('UserDAO');
+        $this->assertTrue(isset($dao));
+        $this->assertIsA($dao, 'UserMySQLDAO');
+    }
+
+    /**
+     * Test get UserErrorDAO
+     */
+    function testGetUserErrorDAO(){
+        $dao = DAOFactory::getDAO('UserErrorDAO');
+        $this->assertTrue(isset($dao));
+        $this->assertIsA($dao, 'UserErrorMySQLDAO');
+    }
+
+    /**
+     * Test get OwnerDAO
+     */
+    function testGetOwnerDAO(){
+        $dao = DAOFactory::getDAO('OwnerDAO');
+        $this->assertTrue(isset($dao));
+        $this->assertIsA($dao, 'OwnerMySQLDAO');
+    }
+    
+    /**
+     * Test get LinkDAO
+     */
+    function testGetLinkDAO(){
+        $dao = DAOFactory::getDAO('LinkDAO');
+        $this->assertTrue(isset($dao));
+        $this->assertIsA($dao, 'LinkMySQLDAO');
+    }
+
+    /**
+     * Test get OwnerInstanceDAO
+     */
+    function testDAOFactoryConfig() {
+        $owner_instance_dao = DAOFactory::getDAO('OwnerInstanceDAO');
+        $this->assertNotNull($owner_instance_dao);
+        $this->assertIsA($owner_instance_dao, 'OwnerInstanceMySQLDAO');
+    }    
 }

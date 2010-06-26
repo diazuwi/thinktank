@@ -7,11 +7,13 @@
  *
  */
 abstract class ThinkTankAuthController extends ThinkTankController implements Controller {
+    public function __construct($session_started=false) {
+        parent::__construct($session_started);
+    }
+
     public function control() {
         if ($this->isLoggedIn()) {
-            $this->addToView('logged_in_user', $this->getLoggedInUser());
-            $this->addToViewCacheKey($this->getLoggedInUser());
-            return $this->auth_control();
+            return $this->authControl();
         } else {
             //@TODO bounce to sign in page and bounce back to original action once signed in
             if (get_class($this)=='PrivateDashboardController') {
