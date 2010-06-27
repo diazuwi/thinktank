@@ -22,6 +22,12 @@ class Loader {
  */  
   static private $__specialClasses;
   
+/**
+ * Instance of installer
+ * 
+ * @var mixed
+ * @access private
+ */
   static private $__installer;
 
 /**
@@ -167,6 +173,7 @@ class Loader {
     // if config class, also include the config.inc.php
     if ( $class == 'Config' && !class_exists('Config') ) {
       global $THINKTANK_CFG;
+      require_once THINKTANK_WEBAPP_PATH . '/model/class.Config.php';
       
       if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
         // if config file doesn't exist
@@ -181,11 +188,15 @@ class Loader {
         $message .= '<a href="' . THINKTANK_BASE_URL . 'install/">Start Installation!</a>';
         $message .= '</div></div></div>';
         
-        self::$__installer->diePage($message, 'Error');
+        // quick hack for test
+        if ( defined('INSTALLER_ON_TEST') && INSTALLER_ON_TEST ) {
+          throw new Exception('Missing Configuration File');
+        } else {
+          self::$__installer->diePage($message, 'Error');
+        }
       } else {
         // config file exists in THINKTANK_WEBAPP_PATH
         require_once THINKTANK_WEBAPP_PATH . 'config.inc.php';
-        require_once THINKTANK_WEBAPP_PATH . '/model/class.Config.php';
         $config = Config::getInstance();
         
         try {

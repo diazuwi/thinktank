@@ -1,31 +1,11 @@
 <?php
-require_once dirname(__FILE__).'/config.tests.inc.php';
-require_once $SOURCE_ROOT_PATH.'extlib/simpletest/autorun.php';
-require_once $SOURCE_ROOT_PATH.'extlib/simpletest/web_tester.php';
-require_once $SOURCE_ROOT_PATH.'webapp/model/class.Loader.php';
-ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.$INCLUDE_PATH);
-
-define('DS', DIRECTORY_SEPARATOR);
-define('THINKTANK_ROOT_PATH', dirname(dirname(__FILE__)) . DS);
-define('THINKTANK_WEBAPP_PATH', THINKTANK_ROOT_PATH . 'webapp' . DS);
-
+require_once 'classes/class.ThinkTankLoaderTestCase.php';
 /**
  * Test of Loader class
+ * 
  * @author Dwi Widiastuti <admin[at]diazuwi[dot]web[dot]id>
- *
  */
-class TestOfLoader extends UnitTestCase {
-/**
- * Constructor
- */
-  function __construct() {
-      $this->UnitTestCase('Loader class test');
-  }
-  
-  public function tearDown() {
-    Loader::unregister();
-  }
-  
+class TestOfLoader extends ThinkTankLoaderTestCase {  
   public function testLoaderRegisterDefault() {
     $loader = Loader::register();
     
@@ -39,37 +19,7 @@ class TestOfLoader extends UnitTestCase {
     ));
     
     // check special classes
-    $this->assertEqual( Loader::getSpecialClasses(), array(
-      // interfaces
-      'Controller' => THINKTANK_WEBAPP_PATH . 'controller' . DS . 'interface.Controller.php',
-      'CrawlerPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.CrawlerPlugin.php',
-      'FollowDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.FollowDAO.php',
-      'InstanceDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.InstanceDAO.php',
-      'LinkDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.LinkDAO.php',
-      'OwnerDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.OwnerDAO.php',
-      'OwnerInstanceDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.OwnerInstanceDAO.php',
-      'PostDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.PostDAO.php',
-      'PostErrorDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.PostErrorDAO.php',
-      'ThinkTankPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.ThinkTankPlugin.php',
-      'UserDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.UserDAO.php',
-      'UserErrorDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.UserErrorDAO.php',
-      'WebappPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.WebappPlugin.php',
-      
-      // Smarty has different filename
-      'Smarty' => THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
-                  'libs' . DS . 'Smarty.class.php',
-      
-      // Class that belongs to other class file
-      // TODO: remove below when it lives in its own file
-      'UserDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.User.php',
-      'UserErrorDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.User.php',
-      'PluginDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Plugin.php',
-      'OwnerDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Owner.php',
-      'OwnerInstanceDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.OwnerInstance.php',
-      'PostDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Post.php',
-      'PostErrorDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Post.php',
-      'LinkDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Link.php'
-    ));
+    $this->assertEqual( Loader::getSpecialClasses(), $this->specialClasses);
   }
   
   public function testLoaderRegisterWithStringAdditionalPath() {
@@ -118,18 +68,19 @@ class TestOfLoader extends UnitTestCase {
     $this->assertNull(Loader::getSpecialClasses());
   }
   
-  public function testLoaderInstantiateClassesWithoutConfig() {
-    global $SITE_ROOT_PATH;
-    define('THINKTANK_BASE_URL', $SITE_ROOT_PATH);
-    
+  public function testLoaderInstantiateClasses() {
     Loader::register();
+    
+    try {
+      // test classes that use Config
+      $this->assertClassInstantiates(new Captcha);
+    } catch (Exception $e) {}
     
     $this->assertIsA(new Crawler, 'Crawler');
     $this->assertIsA(new DAOFactory, 'DAOFactory');
-  }
-  
-  public function testLoaderInstantiaiteClassesWithConfig() {
-    
+    $this->assertIsA(Installer::getInstance(), 'Installer');
+    $this->assertIsA(Config::getInstance(), 'Config');
+    $this->assertIsA(Logger::getInstance('/tmp/test.log'), 'Logger');
   }
 }
 ?>
