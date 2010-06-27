@@ -39,6 +39,13 @@ class Loader {
       __CLASS__, 'load'
     ));
   }
+  
+  static public function unregister() {
+    self::$__lookupPath = null;
+    self::$__specialClasses = null;
+    
+    return spl_autoload_unregister( array(__CLASS__, 'load') );
+  }
 
 /**
  * Set additional lookup path classes
@@ -56,7 +63,7 @@ class Loader {
     }
     
     if ( !defined('THINKTANK_WEBAPP_PATH') ) {
-      define('THINKTANK_WEBAPP_PATH', THINKTANK_ROOT_PATH . 'webapp');
+      define('THINKTANK_WEBAPP_PATH', THINKTANK_ROOT_PATH . 'webapp' . DS);
     }
     
     // set default lookup path for classes
@@ -68,11 +75,19 @@ class Loader {
     // set default lookup path for special classes
     self::$__specialClasses = array(
       // interfaces
-      'CrawlerPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.CrawlerPlugin.php',
-      'InstanceDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.InstanceDAO.php',
-      'ThinkTankPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.ThinkTankPlugin.php',
-      'WebappPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.WebappPlugin.php',
       'Controller' => THINKTANK_WEBAPP_PATH . 'controller' . DS . 'interface.Controller.php',
+      'CrawlerPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.CrawlerPlugin.php',
+      'FollowDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.FollowDAO.php',
+      'InstanceDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.InstanceDAO.php',
+      'LinkDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.LinkDAO.php',
+      'OwnerDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.OwnerDAO.php',
+      'OwnerInstanceDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.OwnerInstanceDAO.php',
+      'PostDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.PostDAO.php',
+      'PostErrorDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.PostErrorDAO.php',
+      'ThinkTankPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.ThinkTankPlugin.php',
+      'UserDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.UserDAO.php',
+      'UserErrorDAO' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.UserErrorDAO.php',
+      'WebappPlugin' => THINKTANK_WEBAPP_PATH . 'model' . DS . 'interface.WebappPlugin.php',
       
       // Smarty has different filename
       'Smarty' => THINKTANK_ROOT_PATH . 'extlib' . DS . 'Smarty-2.6.26' . DS .
@@ -99,7 +114,7 @@ class Loader {
     // array is passed
     if ( is_array($additionalPath) && !empty($additionalPath) ) {
       foreach ( $additionalPath as $path ) {
-        self::$__lookupPath[] = $additionalPath;
+        self::$__lookupPath[] = $path;
       }
     }
     
@@ -144,14 +159,15 @@ class Loader {
       return;
     }
     
+    if ( is_null(self::$__installer) ) {
+      require_once THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Installer.php';
+      self::$__installer = Installer::getInstance();
+    }
+    
     // if config class, also include the config.inc.php
     if ( $class == 'Config' && !class_exists('Config') ) {
       global $THINKTANK_CFG;
       
-      if ( is_null(self::$__installer) ) {
-        require_once THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Installer.php';
-        self::$__installer = Installer::getInstance();
-      }
       if ( !file_exists( THINKTANK_WEBAPP_PATH . 'config.inc.php' ) ) {
         // if config file doesn't exist
         
@@ -215,7 +231,7 @@ class Loader {
       }
     }
     
-    require $filename;
+    require_once $filename;
     
     // after including the class, check if class exists
     if ( !class_exists($class, FALSE) ) {

@@ -6,7 +6,7 @@
  *
  */
 class InstallerError extends Exception {
-  function showError() {
+  public function showError() {
     $title = '';
     switch ( $this->getCode() ) {
       case Installer::ERROR_FILE_NOT_FOUND:
