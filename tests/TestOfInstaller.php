@@ -44,7 +44,9 @@ class TestOfInstaller extends ThinkTankInstallerTestCase {
   public function testInstallerCheckDb() {
     $installer = Installer::getInstance();
     
-    // check db
+    // Check db.
+    // Using this way when we handle a method that may
+    // throws an exception
     try {
       $cdb = $installer->checkDb($this->config);
     } catch (Exception $e) {}
@@ -224,29 +226,114 @@ class TestOfInstaller extends ThinkTankInstallerTestCase {
   }
   
   public function testInstallerIsThinkTankInstalled() {
+    global $THINKTANK_CFG;
+    $THINKTANK_CFG['table_prefix'] = $this->config['table_prefix'];
     $installer = Installer::getInstance();
     $config_file = THINKTANK_WEBAPP_PATH . 'config.inc.php';
     $config_file_exists = file_exists($config_file);
     
     if ( $config_file_exists ) {
       // test when config file exists
+      $version_met = $installer->checkStep1();
+      try {
+        $db_check = $installer->checkDb($this->config);
+      } catch (Exception $e) {}
+      $table_present = $installer->isThinkTankTablesExist($this->config);
+      $admin_exists = $installer->isAdminExists($this->config);
+      try {
+        $is_installed = $installer->isThinkTankInstalled();
+      } catch (Exception $e) {}
+      $expected = ($version_met && $db_check && $table_present && $admin_exists);
+      $this->assertEqual($is_installed, $expected);
       
+      // test failing one of requirements
+      try {
+        $is_installed = $installer->isThinkTankInstalled(FALSE);
+      } catch (Exception $e) {}
+      $this->assertFalse($is_installed);
     } else {
       // test when config doesn't exist
       $this->assertFalse( $installer->isThinkTankInstalled() );
       $expected = $installer->getErrorMessages();
       $this->assertEqual( $expected['config_file'], "Config file doesn't exist.");
-    }
-    
-  }
-  
-  public function testInstallerPopulateTables() {
-  }
-  
-  public function testInstallerRepairTables() {
+    } 
   }
   
   public function testInstallerExamineQueries() {
+  }
+  
+  public function testInstallerPopulateTables() {
+    $installer = Installer::getInstance();
+    
+    // test without verbose on empty test database
+    $this->drop();
+    $installer::$showTables = array();
+    $this->assertTrue($installer->populateTables($this->config));
+    $installer::$showTables = array();
+    $this->assertTrue($installer->isThinkTankTablesExist($this->config));
+    $installer::$showTables = array();
+    // will throw an exception if table exists
+    try {
+      $installer->checkTable($this->config);
+      $this->fail();
+    } catch (Exception $e) {
+      $this->pass();
+    }
+    $this->drop();
+    
+    // test with verbose on empty test database
+    $installer::$showTables = array();
+    // supply verbose on second paramater
+    $log_verbose = $installer->populateTables($this->config, true);
+    $this->assertIsA($log_verbose, 'Array');
+    $tables = $installer::$tables;
+    $expected = array();
+    foreach ($tables as $k => $v) {
+      $expected[$v] = "Created table {$this->config['table_prefix']}$v";
+    }
+    $this->assertEqual($log_verbose, $expected);
+    $this->drop();
+    
+    // test on existent tables that's not recognized as a thinktank table
+    $this->create('unordinary_table');
+    $installer::$showTables = array();
+    // supply verbose on second paramater
+    $log_verbose = $installer->populateTables($this->config, true);
+    $this->assertIsA($log_verbose, 'Array');
+    $tables = $installer::$tables;
+    $expected = array();
+    foreach ($tables as $k => $v) {
+      $expected[$v] = "Created table {$this->config['table_prefix']}$v";
+    }
+    $this->assertEqual($log_verbose, $expected);
+    $this->drop();
+    
+    // test on existent tables that's recognized as a thinktank table
+    $this->createAdminTable();
+    $installer::$showTables = array();
+    // supply verbose on second paramater
+    $log_verbose = $installer->populateTables($this->config, true);
+    $this->assertIsA($log_verbose, 'Array');
+    $tables = $installer::$tables;
+    $expected = array();
+    foreach ($tables as $k => $v) {
+      $expected[$v] = "Created table {$this->config['table_prefix']}$v";
+    }
+    unset($expected["{$this->config['table_prefix']}owners"]);
+    $this->assertEqual($log_verbose, $expected);
+    $this->drop();
+    
+    // test on fully thinktank table
+    $installer::$showTables = array();
+    $installer->populateTables($this->config);
+    // supply verbose on second paramater
+    $log_verbose = $installer->populateTables($this->config, true);
+    $expected = array();
+    $this->assertIdentical($log_verbose, $expected);
+    $this->drop();
+  }
+  
+  public function testInstallerRepairTables() {
   }
   
   public function testInstallerValidationAndPasswordGenerator() {

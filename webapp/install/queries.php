@@ -58,7 +58,7 @@ CREATE TABLE {$table['owner_instances']} (
   instance_id int(10) NOT NULL,
   oauth_access_token varchar(255) DEFAULT NULL,
   oauth_access_token_secret varchar(255) DEFAULT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY  (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 CREATE TABLE {$table['owners']} (
   id int(20) NOT NULL AUTO_INCREMENT,
@@ -124,7 +124,7 @@ CREATE TABLE {$table['posts']} (
   is_retweet_by_friend tinyint(4) NOT NULL DEFAULT '0',
   network varchar(10) NOT NULL DEFAULT 'twitter',
   is_geo_encoded int(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id),
+  PRIMARY KEY  (id),
   UNIQUE KEY status_id (post_id),
   KEY author_username (author_username),
   KEY pub_date (pub_date),

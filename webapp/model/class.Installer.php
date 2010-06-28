@@ -135,7 +135,7 @@ class Installer {
 /**
  * Check PHP version
  * 
- * @param string $ver can be used for testing
+ * @param string $ver can be used for testing for failing
  * @access public
  * @return bool Requirements met
  */
@@ -163,9 +163,11 @@ class Installer {
   
 /**
  * Check GD and cURL
+ * 
+ * @param array $libs can be used for testing for failing
  * @return array
  */
-  public function checkDependency() {
+  public function checkDependency($libs = array()) {
     $ret = array('curl' => false, 'gd' => false);
     // check curl
     if ( extension_loaded('curl') && function_exists('curl_exec') ) {
@@ -177,15 +179,22 @@ class Installer {
       $ret['gd'] = true;
     }
     
+    // when testing
+    if ( defined('INSTALLER_ON_TEST') && INSTALLER_ON_TEST && !empty($libs) ) {
+      $ret = $libs;
+    }
+    
     return $ret;
   }
 
 /**
  * Check if log and template directories are writeable
+ * 
+ * @param array $perms can be used for testing for failing
  * @access public
  * @return array
  */  
-  public function checkPermission() {
+  public function checkPermission($perms = array()) {
     $ret = array(
       'logs' => false, 'compiled_view' => false, 'cache' => false
     );
@@ -200,6 +209,11 @@ class Installer {
     
     if ( is_writable(self::$__view->compile_dir . 'cache') ) {
       $ret['cache'] = true;
+    }
+    
+    // when testing
+    if ( defined('INSTALLER_ON_TEST') && INSTALLER_ON_TEST && !empty($perms) ) {
+      $ret = $perms;
     }
     
     return $ret;
@@ -235,11 +249,13 @@ class Installer {
 
 /**
  * Check all requirements on step 1
- * Check PHP version, cURL, 
+ * Check PHP version, cURL, GD and path permission
+ * 
+ * @param array $pass can be used for testing for failing
  * @access public
  * @return bool
  */  
-  public function checkStep1() {
+  public function checkStep1($pass = true) {
     $version_compat = $this->checkVersion();
     
     $lib_depends = $this->checkDependency();
@@ -254,7 +270,14 @@ class Installer {
       $writeable_permission_ret = $writeable_permission_ret && $permission;
     }
     
-    return ($version_compat && $lib_depends_ret && $writeable_permission_ret);
+    // when testing
+    if ( defined('INSTALLER_ON_TEST') && INSTALLER_ON_TEST && !empty($pass) ) {
+      $ret = $pass;
+    } else {
+      $ret = ($version_compat && $lib_depends_ret && $writeable_permission_ret);
+    }
+    
+    return $ret;
   }
 
 /**
@@ -347,7 +370,7 @@ class Installer {
   }
 
 /**
- * Check table existent. Return true when ThinkTank table exists.
+ * Check table existent. 
  * See also self::isThinkTankTablesExist().
  * The different between self::isThinkTankTablesExist is, self::isThinkTankTablesExist doesn't
  * throw an error and returns boolean value.
@@ -381,10 +404,11 @@ class Installer {
   }
 
 /**
- * Check if thinktank table exists and its okay
+ * Check if thinktank table exists and its okay. Return true when ThinkTank table exists.
  * The different between self::checkTable is, self::isThinkTankTablesExist doesn't
  * throw an error and returns boolean value. This method should be called when
- * we're not in installation steps
+ * we're not in installation steps.
+ * 
  * @param array $config
  * @return bool true when ThinkTank tables Exist
  */  
@@ -468,10 +492,12 @@ class Installer {
   }
 
 /**
- * Check if ThinkTank is already installed
+ * Check if ThinkTank is already installed.
+ * 
+ * @param array $pass can be used for testing for failing
  * @return bool true when ThinkTank is already installed
  */  
-  function isThinkTankInstalled() {
+  function isThinkTankInstalled($pass = true) {
     // check if file config present
     $config_file_exists = false;
     $config_file = THINKTANK_WEBAPP_PATH . 'config.inc.php';
@@ -487,6 +513,10 @@ class Installer {
     
     // check version is met
     $version_met = self::checkStep1();
+    // when testing
+    if ( defined('INSTALLER_ON_TEST') && INSTALLER_ON_TEST && !empty($pass) ) {
+      $version_met = $pass;
+    }
     if ( !$version_met ) {
       self::$__errorMessages['requirements'] = "Requirements are not met. " .
         "Make sure your PHP version >= " . self::$__requiredVersion['php'] .
@@ -516,11 +546,14 @@ class Installer {
 
 /**
  * populate table / execute queries in queries.php
+ * 
  * @param array $config database configuration
  * @param bool $verbose database configuration
  * @return mixed
  */  
   function populateTables($config, $verbose = false) {
+    global $install_queries;
+    
     $table = array();
     foreach (self::$tables as $t) {
       $table[$t] = $config['table_prefix'] . $t;
@@ -533,8 +566,8 @@ class Installer {
     }
     require_once $query_file;
     
-    $install_queries = self::examineQueries($install_queries);
-    foreach ($install_queries['queries'] as $query) {
+    $expected_queries = self::examineQueries($install_queries);
+    foreach ($expected_queries['queries'] as $query) {
       try {
         self::$db->exec($query);
       } catch (InstallerError $e) {
@@ -543,7 +576,7 @@ class Installer {
     }
     
     if ( $verbose ) {
-      return $install_queries['for_update'];
+      return $expected_queries['for_update'];
     } else {
       return true;
     }
