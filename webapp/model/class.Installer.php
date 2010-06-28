@@ -80,6 +80,11 @@ class Installer {
   public static $db;
   
 /**
+ * Database connection
+ */
+  public static $conn;
+  
+/**
  * Temporary var. Helper
  * when hold temporary var between method calls
  */
@@ -101,7 +106,7 @@ class Installer {
       
       // use lazy loading
       if ( !class_exists('Loader', FALSE) ) {
-        require_once 'class.Loader.php';
+        require_once THINKTANK_WEBAPP_PATH . 'model' . DS . 'class.Loader.php';
       }
       Loader::register();
       
@@ -130,21 +135,37 @@ class Installer {
 /**
  * Check PHP version
  * 
+ * @param string $ver can be used for testing
  * @access public
  * @return bool Requirements met
  */
-  function checkVersion() {
+  public function checkVersion($ver = '') {
     $ret = false;
-    $ret = version_compare( phpversion(), self::$__requiredVersion['php'], '>=' );
+    $version = phpversion();
+    
+    // when testing
+    if ( defined('INSTALLER_ON_TEST') && INSTALLER_ON_TEST && !empty($ver) ) {
+      $version = $ver;
+    }
+    
+    $ret = version_compare( $version, self::$__requiredVersion['php'], '>=' );
     
     return $ret;
   }
-
+  
+  public function getCurrentVersion() {
+    return self::$__currentVersion;
+  }
+  
+  public function getRequiredVersion() {
+    return self::$__requiredVersion;
+  }
+  
 /**
  * Check GD and cURL
  * @return array
  */
-  function checkDependency() {
+  public function checkDependency() {
     $ret = array('curl' => false, 'gd' => false);
     // check curl
     if ( extension_loaded('curl') && function_exists('curl_exec') ) {
@@ -164,7 +185,7 @@ class Installer {
  * @access public
  * @return array
  */  
-  function checkPermission() {
+  public function checkPermission() {
     $ret = array(
       'logs' => false, 'compiled_view' => false, 'cache' => false
     );
@@ -188,7 +209,7 @@ class Installer {
  * Check path existent
  * @param array $config
  */
-  function checkPath($config) {
+  public function checkPath($config) {
     // check if $THINKTANK_CFG related to path exists
     if ( !is_dir($config['source_root_path']) ) {
       throw new InstallerError(
@@ -218,7 +239,7 @@ class Installer {
  * @access public
  * @return bool
  */  
-  function checkStep1() {
+  public function checkStep1() {
     $version_compat = $this->checkVersion();
     
     $lib_depends = $this->checkDependency();
@@ -238,17 +259,18 @@ class Installer {
 
 /**
  * Set db property
- * @param array $config
+ * @param array $config Database config
  */  
-  function setDb($config) {
+  public function setDb($config) {
     self::$db = new Database($config);
+    
     try {
       $c = self::$db->getConnection();
     } catch (Exception $e) {
       $e->getMessage();
     }
     
-    if (!$c) {
+    if ( !$c) {
       throw new InstallerError(
         '<p>Failed establishing database connection. Probably either your username, ' .
         '<code>' . $config['db_user'] . '</code>, and password, <code>' . $config['db_password'] .
@@ -258,6 +280,7 @@ class Installer {
         self::ERROR_DB_CONNECT
       );
     }
+    self::$conn = $c;
     
     return self::$db;
   }
@@ -324,7 +347,11 @@ class Installer {
   }
 
 /**
- * Check table existent, see also self::isThinkTankTablesExist()
+ * Check table existent. Return true when ThinkTank table exists.
+ * See also self::isThinkTankTablesExist().
+ * The different between self::isThinkTankTablesExist is, self::isThinkTankTablesExist doesn't
+ * throw an error and returns boolean value.
+ * 
  * @param array $config
  * @return mixed throw error when table exists
  *         return true when thinktank tables don't exist
@@ -805,10 +832,10 @@ class Installer {
 /**
  * Validate Site Name
  * @param string $sitename Site name to check
- * @access private
+ * @access public
  * @return mixed
  */
-  private function __checkSiteName($sitename = '') {
+  public function checkSiteName($sitename = '') {
     if ( empty($sitename) ) {
       throw new InstallerError(
         "<p>Please provide valid site name.</p>",
@@ -822,9 +849,10 @@ class Installer {
 /**
  * Validate email
  * @param string $email Email to be validated
+ * @access public
  * @return mixed
  */  
-  private function __checkValidEmail($email = '') {
+  public function checkValidEmail($email = '') {
     if ( !eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $email) ) {
       throw new InstallerError(
         "<p>Please provide valid email.</p>",
@@ -838,16 +866,16 @@ class Installer {
 /**
  * Generate random password for step 4
  * @param int $length the length of generated random password
- * @access private
+ * @access public
  * @return string $pass random password
  */  
-  private function __generatePassword($length = 8) {
+  public function generatePassword($length = 8) {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
     srand( (double)microtime()*1000000 );
     $i = 0;
     $pass = '';
     
-    while ($i++ <= $length) {
+    while ($i++ < $length) {
       $num   = rand() % 64;
       $tmp   = substr($chars, $num, 1);
       $pass .= $tmp;
@@ -986,10 +1014,10 @@ class Installer {
     }
     
     try {
-      self::__checkSiteName($site_name);
+      self::checkSiteName($site_name);
             
       try {
-        self::__checkValidEmail($site_email);
+        self::checkValidEmail($site_email);
       } catch (InstallerError $e) {
         $e->showError();
       }
@@ -1128,7 +1156,7 @@ class Installer {
     $admin_exists = self::isAdminExists();
     
     if ( !$admin_exists ) { // create admin if not exists
-      $password = self::__generatePassword();
+      $password = self::generatePassword();
       $q = "INSERT INTO {$db_config['table_prefix']}owners ";
       $q .= " (`user_email`,`user_pwd`,`country`,`joined`,`activation_code`,`full_name`, `user_activated`, `is_admin`)";
       $q .= " VALUES ('".$site_email."','".md5($password)."','".$country."',now(),'','".$owner_name."', 1, 1)";
@@ -1262,7 +1290,7 @@ class Installer {
         $site_email   = trim($_POST['site_email']);
         $owner_name   = trim($_POST['owner_name']);
         $country      = trim($_POST['country']);
-        $password = self::__generatePassword();
+        $password = self::generatePassword();
         $q = "INSERT INTO {$THINKTANK_CFG['table_prefix']}owners ";
         $q .= " (`user_email`,`user_pwd`,`country`,`joined`,`activation_code`,`full_name`, `user_activated`, `is_admin`)";
         $q .= " VALUES ('".$site_email."','".md5($password)."','".$country."',now(),'','".$owner_name."', 1, 1)";
