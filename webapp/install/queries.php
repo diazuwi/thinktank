@@ -1,6 +1,8 @@
 <?php
 /**
- * After the 'PRIMARY KEY' keyword there must be two spaces
+ * Requirements:
+ * - Each statement must be separated by semicolon(;)
+ * - After the 'PRIMARY KEY' keyword there must be two spaces
  */
 $install_queries = "
 ALTER DATABASE DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;

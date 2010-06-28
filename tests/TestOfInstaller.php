@@ -260,13 +260,51 @@ class TestOfInstaller extends ThinkTankInstallerTestCase {
   }
   
   public function testInstallerExamineQueries() {
+    global $install_queries;
+    
+    $installer = Installer::getInstance();
+    $this->drop();
+    $installer::$showTables = array();
+    $installer->populateTables($this->config);
+    
+    // test on fully installed tables
+    $output = $installer->examineQueries($install_queries);
+    $this->assertIdentical( array(), $output['for_update'] );
+    $expected = "/INSERT INTO plugins/i";
+    $this->assertIdentical( array(), $output['for_update'] );
+    $this->assertPattern( $expected, $output['queries'][0] );
+    
+    // test on missing tables
+    $this->del($this->config['table_prefix'] . 'owners');
+    $installer::$showTables = array();
+    $output = $installer->examineQueries($install_queries);
+    $expected = "/Created table {$this->config['table_prefix']}owners/i";
+    $this->assertPattern($expected, $output['for_update'][$this->config['table_prefix'] . 'owners']);
+    $expected = "/CREATE TABLE {$this->config['table_prefix']}owners /i";
+    $this->assertPattern($expected, $output['queries'][$this->config['table_prefix'] . 'owners']);
+    
+    // test on missing PRIMARY KEY
+    $this->db->exec("ALTER TABLE {$this->config['table_prefix']}follows DROP PRIMARY KEY");
+    $installer::$showTables = array();
+    $output = $installer->examineQueries($install_queries);
+    $add_pk = "ALTER TABLE {$this->config['table_prefix']}follows ADD PRIMARY KEY  (user_id,follower_id)";
+    $add_pk_exists = in_array($add_pk, $output['queries']);
+    $this->assertTrue($add_pk_exists);
+    
+    // test on missing index
+    $this->db->exec("ALTER TABLE {$this->config['table_prefix']}follows DROP INDEX active");
+    $installer::$showTables = array();
+    $output = $installer->examineQueries($install_queries);
+    $add_idx = "ALTER TABLE {$this->config['table_prefix']}follows ADD KEY active (active)";
+    $add_idx_exists = in_array($add_idx, $output['queries']);
+    $this->drop();
   }
   
   public function testInstallerPopulateTables() {
     $installer = Installer::getInstance();
+    $this->drop();
     
     // test without verbose on empty test database
-    $this->drop();
     $installer::$showTables = array();
     $this->assertTrue($installer->populateTables($this->config));
     $installer::$showTables = array();
@@ -334,6 +372,23 @@ class TestOfInstaller extends ThinkTankInstallerTestCase {
   }
   
   public function testInstallerRepairTables() {
+    $installer = Installer::getInstance();
+    $this->drop();
+    
+    // test repair on a healthy and complete tables
+    $installer::$showTables = array();
+    $installer->populateTables($this->config);
+    $expected = '<p>Your ThinkTank tables are <strong class="okay">complete</strong>.</p>';
+    $messages = $installer->repairTables($this->config);
+    $this->assertIdentical($messages['table_complete'], $expected);
+    
+    // test repair on missing tables
+    $this->del($this->config['table_prefix'] . 'owners');
+    $installer::$showTables = array();
+    $expected = '/There are <strong class="not_okay">1 missing tables/i';
+    $messages = $installer->repairTables($this->config);
+    $this->assertPattern($expected, $messages['missing_tables']);
+    $this->drop();
   }
   
   public function testInstallerValidationAndPasswordGenerator() {
