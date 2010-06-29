@@ -17,15 +17,17 @@ class TestOfInstaller extends ThinkTankInstallerTestCase {
   
   public function testInstallerCheckDependency() {
     $dependency = Installer::checkDependency();
-    $this->assertTrue($dependency['curl']);
-    $this->assertTrue($dependency['gd']);
+    $this->assertTrue($dependency['curl'], 'cURL is installed');
+    $this->assertTrue($dependency['gd'], 'gd lib is installed');
   }
   
   public function testInstallerCheckPermission() {
     $perms = Installer::checkPermission();
-    $this->assertTrue($perms['logs']);
-    $this->assertTrue($perms['compiled_view']);
-    $this->assertTrue($perms['cache']);
+    $this->assertTrue($perms['logs'], THINKTANK_ROOT_PATH . 'logs is writeable by the webserver');
+    $this->assertTrue($perms['compiled_view'], THINKTANK_ROOT_PATH .
+      'webapp' . DS . 'view' . DS . 'compiled_view is writeable by the webserver');
+    $this->assertTrue($perms['cache'], THINKTANK_ROOT_PATH .
+      'webapp' . DS . 'view' . DS . 'compiled_view' . DS . 'cache is writeable by the webserver');
   }
   
   public function testInstallerCheckPath() {

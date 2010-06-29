@@ -939,20 +939,44 @@ class Installer {
  * @return void
  */  
   private function __step1() {
+    // php version check
     $php_compat = 0;
     if ( $this->checkVersion() ) {
       $php_compat = 1;
     }
     self::$__view->assign('php_compat', $php_compat);
     self::$__view->assign('php_required_version', self::$__requiredVersion['php']);
-    self::$__view->assign('libs', self::checkDependency());
-    self::$__view->assign('permission', self::checkPermission());
+    
+    // libs check
+    $libs = self::checkDependency();
+    $libs_compat = TRUE;
+    foreach ($libs as $lib) {
+      if (!$lib) {
+        $libs_compat = FALSE;
+      }
+    }
+    self::$__view->assign('libs', $libs);
+    
+    // path permissions check
+    $permissions = self::checkPermission();
+    self::$__view->assign('permission', $permissions);
+    $permissions_compat = TRUE;
+    foreach ($permissions as $perm) {
+      if (!$perm) {
+        $permissions_compat = FALSE;
+      }
+    }
+    self::$__view->assign('permissions_compat', $permissions_compat);
     $writeable_directories = array(
       'logs' => THINKTANK_ROOT_PATH . 'logs',
       'compiled_view' => self::$__view->compile_dir,
       'cache' => self::$__view->compile_dir . 'cache'
     );
     self::$__view->assign('writeable_directories', $writeable_directories);
+    
+    // other vars set to view
+    $requirements_met = ($php_compat && $libs_compat && $permissions_compat);
+    self::$__view->assign('requirements_met', $requirements_met);
     self::$__view->assign('subtitle', 'Requirements Check');
   }
 
