@@ -1336,6 +1336,11 @@ class Installer {
       $succeed = false;
       $messages = array();
       
+      // set db
+      if ( !self::$db ) {
+        self::setDb($THINKTANK_CFG);
+      }
+      
       // check if we repairing db
       if ( isset($params['db']) ) {
         $messages['db'] = self::repairTables($THINKTANK_CFG);
