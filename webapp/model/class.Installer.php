@@ -1228,7 +1228,7 @@ class Installer {
       $email_view->assign('server', $_SERVER['HTTP_HOST'] . THINKTANK_BASE_URL);
       $email_view->assign('site_email', $site_email);
       $email_view->assign('password', $password);
-      $email_message = $email_view->fetch('installer.step3.email.tpl');
+      $email_message = $email_view->fetch('installer.step.3.email.tpl');
       
       // send email
       $subject = "Your ThinkTank Installation";
