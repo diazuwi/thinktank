@@ -1218,6 +1218,21 @@ class Installer {
       $q .= " (`user_email`,`user_pwd`,`country`,`joined`,`activation_code`,`full_name`, `user_activated`, `is_admin`)";
       $q .= " VALUES ('".$site_email."','".md5($password)."','".$country."',now(),'','".$owner_name."', 1, 1)";
       self::$db->exec($q);
+      
+      // view for email
+      $email_view = new Smarty();
+      $email_view->template_dir = array(THINKTANK_WEBAPP_PATH . 'view');
+      $email_view->compile_dir = THINKTANK_WEBAPP_PATH . 'view' . DS . 'compiled_view' . DS;
+      $email_view->caching = FALSE;
+      $email_view->assign('site_name', $site_name);
+      $email_view->assign('server', $_SERVER['HTTP_HOST'] . THINKTANK_BASE_URL);
+      $email_view->assign('site_email', $site_email);
+      $email_view->assign('password', $password);
+      $email_message = $email_view->fetch('installer.step.3.email.tpl');
+      
+      // send email
+      $subject = "Your ThinkTank Installation";
+      Mailer::mail($site_email, $subject, $email_message);
     } else {
       $site_email = 'Use your old email';
       $password = 'Use your old password';
