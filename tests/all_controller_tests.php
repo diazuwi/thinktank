@@ -14,6 +14,7 @@ require_once $SOURCE_ROOT_PATH.'tests/TestOfCheckCrawlerController.php';
 require_once $SOURCE_ROOT_PATH.'tests/TestOfExportController.php';
 require_once $SOURCE_ROOT_PATH.'tests/TestOfForgotPasswordController.php';
 require_once $SOURCE_ROOT_PATH.'tests/TestOfInlineViewController.php';
+require_once $SOURCE_ROOT_PATH.'tests/TestOfInstallerController.php';
 require_once $SOURCE_ROOT_PATH.'tests/TestOfLoginController.php';
 require_once $SOURCE_ROOT_PATH.'tests/TestOfLogoutController.php';
 require_once $SOURCE_ROOT_PATH.'tests/TestOfPasswordResetController.php';
